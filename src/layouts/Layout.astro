@@ -1,0 +1,215 @@
+---
+import '../styles/globals.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  hideFooter?: boolean;
+}
+
+const {
+  title,
+  description = '个人专栏 · 知识分享 · 系统教程 · 项目实战',
+  hideFooter = false,
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const category = Astro.url.searchParams.get('category');
+const year = new Date().getFullYear();
+
+const isHome = pathname === '/' || pathname === '';
+const isBlogList = pathname === '/blog' || pathname === '/blog/';
+const isProjects = pathname.startsWith('/projects');
+const navItems = [
+  {
+    href: '/',
+    label: '首页',
+    match: () => isHome,
+  },
+  {
+    href: '/blog',
+    label: '博客',
+    match: () =>
+      pathname.startsWith('/blog') &&
+      category !== '系统教程',
+  },
+  {
+    href: '/blog?category=系统教程',
+    label: '系统教程',
+    match: () => isBlogList && category === '系统教程',
+  },
+  {
+    href: '/projects',
+    label: '项目实战',
+    match: () => isProjects || (isBlogList && category === '项目实战'),
+  },
+];
+---
+
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Syne:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+		<title>{title}</title>
+	</head>
+	<body class:list={['font-body bg-background text-foreground antialiased', hideFooter ? 'h-dvh overflow-hidden' : 'min-h-screen']}>
+		<header
+			id="site-header"
+			class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+			data-home={isHome ? 'true' : 'false'}
+		>
+			<div class="mx-auto max-w-6xl px-4 sm:px-6">
+				<div
+					class="mt-3 flex items-center justify-between rounded-2xl border border-transparent px-5 py-3 text-foreground transition-all duration-300"
+					id="header-inner"
+				>
+					<a href="/" class="flex items-center gap-2.5 group">
+						<div
+							class="flex h-9 w-9 items-center justify-center rounded-xl bg-[hsl(var(--accent))] font-display text-lg font-bold text-[hsl(var(--accent-foreground))] transition-transform group-hover:scale-105"
+						>
+							知
+						</div>
+						<span class="font-display text-lg font-bold tracking-tight">知识专栏</span>
+					</a>
+
+					<nav class="hidden items-center gap-1 md:flex">
+						{navItems.map((item) => (
+							<a
+								href={item.href}
+								class:list={[
+									'nav-link rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
+									item.match() ? 'nav-link-active' : '',
+								]}
+							>
+								{item.label}
+							</a>
+						))}
+					</nav>
+
+					<div class="flex items-center gap-3">
+						<a
+							id="header-cta"
+							href="/about"
+							class="hidden rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.02] sm:block"
+						>关注我</a>
+						<button
+							id="mobile-toggle"
+							class="mobile-toggle rounded-lg p-2 md:hidden"
+							aria-label="菜单"
+							aria-expanded="false"
+							aria-controls="mobile-menu"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<line x1="3" y1="6" x2="21" y2="6"></line>
+								<line x1="3" y1="12" x2="21" y2="12"></line>
+								<line x1="3" y1="18" x2="21" y2="18"></line>
+							</svg>
+						</button>
+					</div>
+				</div>
+
+				<div
+					id="mobile-menu"
+					class="hidden rounded-2xl border border-border bg-card p-3 text-foreground shadow-soft md:hidden"
+				>
+					<div class="flex flex-col gap-1">
+						{navItems.map((item) => (
+							<a href={item.href} class="rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-secondary">
+								{item.label}
+							</a>
+						))}
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<slot />
+
+		{!hideFooter && (
+			<footer class="border-t border-border bg-[hsl(var(--ink))] text-white">
+				<div class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+					<div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+						<div class="flex items-center gap-2.5">
+							<div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[hsl(var(--accent))] font-display text-lg font-bold text-[hsl(var(--accent-foreground))]">知</div>
+							<div>
+								<p class="font-display font-bold">知识专栏</p>
+								<p class="text-xs text-white/50">分享知识，连接热爱</p>
+							</div>
+						</div>
+
+						<nav class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/55">
+							<a href="/" class="transition-colors hover:text-white">首页</a>
+							<a href="/blog" class="transition-colors hover:text-white">博客</a>
+							<a href="/blog?category=系统教程" class="transition-colors hover:text-white">系统教程</a>
+							<a href="/projects" class="transition-colors hover:text-white">项目实战</a>
+							<a href="/about" class="transition-colors hover:text-white">关于</a>
+						</nav>
+					</div>
+					<div class="mt-8 border-t border-white/10 pt-6 text-center text-xs text-white/40">
+						<p>© {year} 知识专栏 · 用心分享每一份知识</p>
+					</div>
+				</div>
+			</footer>
+		)}
+
+		<script>
+			const headerInner = document.getElementById('header-inner');
+
+			const onScroll = () => {
+				const scrolled = window.scrollY > 24;
+				if (scrolled) {
+					headerInner?.classList.add('glass', 'border-border', 'shadow-soft');
+					headerInner?.classList.remove('border-transparent');
+				} else {
+					headerInner?.classList.remove('glass', 'border-border', 'shadow-soft');
+					headerInner?.classList.add('border-transparent');
+				}
+			};
+			window.addEventListener('scroll', onScroll);
+			onScroll();
+
+			const toggle = document.getElementById('mobile-toggle');
+			const menu = document.getElementById('mobile-menu');
+			toggle?.addEventListener('click', () => {
+				const open = menu?.classList.toggle('hidden') === false;
+				toggle.setAttribute('aria-expanded', String(open));
+			});
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	html {
+		font-family: "Noto Sans SC", "Syne", sans-serif;
+	}
+	.font-display {
+		font-family: "Syne", "Noto Sans SC", sans-serif;
+	}
+	code, pre {
+		font-family: "JetBrains Mono", Menlo, Monaco, monospace;
+	}
+	#header-inner .nav-link {
+		color: hsl(var(--muted-foreground));
+	}
+	#header-inner .nav-link:hover {
+		color: hsl(var(--foreground));
+		background: hsl(var(--secondary));
+	}
+	#header-inner .nav-link-active {
+		color: hsl(var(--foreground));
+		background: hsl(var(--secondary));
+	}
+	#header-inner .mobile-toggle:hover {
+		background: hsl(var(--secondary));
+	}
+</style>

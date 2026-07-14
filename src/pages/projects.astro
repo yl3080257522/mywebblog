@@ -1,0 +1,54 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProjectCarousel from '../components/ProjectCarousel';
+import { projects } from '../data/projects';
+import { articles } from '../data/articles';
+
+const related = articles.filter((a) => a.category === '项目实战');
+---
+
+<Layout title="项目实战 · 知识专栏" description="精选个人项目与实战作品展示">
+	<section class="relative overflow-hidden pt-28 pb-8 sm:pt-32">
+		<div class="pointer-events-none absolute inset-0 atmosphere"></div>
+		<div class="relative mx-auto max-w-6xl px-4 sm:px-6">
+			<p class="font-display text-xs font-semibold uppercase tracking-[0.25em] text-primary">Projects</p>
+			<h1 class="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">项目实战</h1>
+			<p class="mt-3 max-w-xl text-muted-foreground">
+				拖动卡片旋转查看作品；也可从下方教程入手动手复现。
+			</p>
+		</div>
+	</section>
+
+	<section class="relative pb-16 sm:pb-20">
+		<div class="mx-auto max-w-6xl px-4 sm:px-6">
+			<ProjectCarousel client:load projects={projects} />
+		</div>
+	</section>
+
+	{related.length > 0 && (
+		<section class="border-t border-border bg-background py-16 sm:py-20">
+			<div class="mx-auto max-w-6xl px-4 sm:px-6">
+				<p class="text-sm font-bold tracking-wide text-[hsl(var(--accent))]">相关教程</p>
+				<ul class="mt-8 divide-y divide-border border-y border-border">
+					{related.map((article) => (
+						<li>
+							<a
+								href={`/blog/${article.slug}`}
+								class="group flex flex-col gap-2 py-5 transition-colors sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
+							>
+								<div class="min-w-0">
+									<p class="text-xs text-muted-foreground">{article.date} · {article.readTime}</p>
+									<h2 class="mt-1 font-display text-lg font-semibold tracking-tight transition-colors group-hover:text-primary sm:text-xl">
+										{article.title}
+									</h2>
+									<p class="mt-1 text-sm text-muted-foreground line-clamp-2">{article.excerpt}</p>
+								</div>
+								<span class="shrink-0 text-sm font-medium text-primary">阅读 →</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			</div>
+		</section>
+	)}
+</Layout>

@@ -1,0 +1,166 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const skills = [
+	{ name: 'R / Bioconductor', level: 90 },
+	{ name: 'Python / PyTorch', level: 85 },
+	{ name: 'React / TypeScript', level: 80 },
+	{ name: 'Docker / DevOps', level: 70 },
+];
+
+const socials = [
+	{
+		name: '抖音',
+		handle: '@知识专栏',
+		desc: '短视频教程 · 日常分享',
+		color: 'bg-black',
+		icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 3.37-4.39V9.5a6.34 6.34 0 0 0-1.05-.1A6.34 6.34 0 0 0 5 20.7a6.34 6.34 0 0 0 10.66-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.3z"/></svg>',
+	},
+	{
+		name: '微信公众号',
+		handle: '知识专栏Pro',
+		desc: '深度文章首发 · 独家资源',
+		color: 'bg-[#07C160]',
+		icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8.691 2C4.768 2 1.5 4.671 1.5 8.008c0 1.895 1.097 3.582 2.812 4.683l-.703 2.115 2.461-1.262c.879.175 1.582.351 2.461.351.176 0 .351-.012.526-.024-.109-.351-.176-.714-.176-1.097 0-3.226 2.812-5.851 6.328-5.851.176 0 .351 0 .526.012C15.326 4.418 12.352 2 8.691 2zm-2.46 2.812a.914.914 0 1 1 0 1.828.914.914 0 0 1 0-1.828zm5.013 0a.914.914 0 1 1 0 1.828.914.914 0 0 1 0-1.828zm4.747 3.515c-3.043 0-5.508 2.109-5.508 4.687 0 2.625 2.465 4.687 5.508 4.687.703 0 1.406-.175 2.109-.351l1.934 1.055-.527-1.64c1.406-.879 2.461-2.285 2.461-3.75 0-2.625-2.461-4.688-5.508-4.688zm-1.828 2.109a.703.703 0 1 1 0 1.406.703.703 0 0 1 0-1.406zm3.515 0a.703.703 0 1 1 0 1.406.703.703 0 0 1 0-1.406z"/></svg>',
+	},
+	{
+		name: 'Bilibili',
+		handle: '知识专栏',
+		desc: '长视频教程 · 课程合集',
+		color: 'bg-[#FB7299]',
+		icon: '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.813 4.653h.85c1.51.044 2.769.566 3.773 1.674.99 1.08 1.476 2.406 1.476 3.956v6.683c0 1.55-.486 2.876-1.476 3.956-1.004 1.108-2.262 1.63-3.773 1.674H5.237c-1.51-.044-2.769-.566-3.773-1.674C.974 19.842.488 18.516.488 16.966v-6.683c0-1.55.486-2.876 1.476-3.956C2.968 5.219 4.226 4.697 5.737 4.653h.85l-1.42-1.42a.886.886 0 0 1-.273-.645c0-.256.085-.466.273-.645A.886.886 0 0 1 5.8 1.67c.256 0 .466.085.645.273l2.836 2.836h5.438l2.836-2.836a.886.886 0 0 1 .645-.273c.256 0 .466.085.645.273a.886.886 0 0 1 .273.645.886.886 0 0 1-.273.645l-1.42 1.42zM7.737 8.653c-.5 0-.926.17-1.273.5-.36.35-.545.77-.545 1.273 0 .5.185.926.545 1.273.347.33.773.5 1.273.5.5 0 .926-.17 1.273-.5.36-.347.545-.773.545-1.273 0-.503-.185-.923-.545-1.273-.347-.33-.773-.5-1.273-.5zm8.526 0c-.5 0-.926.17-1.273.5-.36.35-.545.77-.545 1.273 0 .5.185.926.545 1.273.347.33.773.5 1.273.5.5 0 .926-.17 1.273-.5.36-.347.545-.773.545-1.273 0-.503-.185-.923-.545-1.273-.347-.33-.773-.5-1.273-.5z"/></svg>',
+	},
+];
+
+const timeline = [
+	{ year: '2025', title: '创办「知识专栏」', desc: '开始系统分享生物信息学与数据科学知识' },
+	{ year: '2023', title: '全栈开发转型', desc: '深入 React、TypeScript 与云原生技术栈' },
+	{ year: '2021', title: '生物信息学研究', desc: '发表多篇单细胞测序相关论文' },
+	{ year: '2019', title: '开始编程之旅', desc: '从 R 语言入门数据科学' },
+];
+---
+
+<Layout title="关于我 · 知识专栏">
+	<!-- Hero -->
+	<section class="relative overflow-hidden pt-32 pb-16">
+		<div class="absolute inset-0 grid-pattern opacity-40"></div>
+		<div class="absolute top-10 left-1/2 -translate-x-1/2 h-[300px] w-[500px] rounded-full bg-accent/10 blur-[100px]"></div>
+
+		<div class="relative mx-auto max-w-4xl px-4 sm:px-6">
+			<div class="flex flex-col items-center gap-8 md:flex-row md:items-start">
+				<!-- Avatar -->
+				<div class="relative shrink-0">
+					<div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary to-accent blur-xl opacity-30"></div>
+					<div class="relative flex h-32 w-32 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-accent text-5xl font-bold text-white shadow-2xl shadow-primary/20">
+						知
+					</div>
+				</div>
+
+				<div class="flex-1 text-center md:text-left">
+					<h1 class="text-3xl font-bold tracking-tight sm:text-4xl">你好，我是<span class="gradient-text"> 知识专栏</span></h1>
+					<p class="mt-3 text-lg text-muted-foreground leading-relaxed">
+						生物信息学研究者 · 数据科学实践者 · 全栈开发者
+					</p>
+					<p class="mt-4 leading-relaxed text-muted-foreground">
+						热爱用代码解决科学问题，用文字传递知识价值。在这里分享文献解读、项目实战、视频课程与技术随笔，
+						希望帮助更多人在数据科学的道路上少走弯路。
+					</p>
+					<div class="mt-6 flex flex-wrap justify-center gap-3 md:justify-start">
+						<a href="/blog" class="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105">
+							阅读我的文章
+						</a>
+						<a href="#contact" class="rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-medium transition-all hover:bg-secondary hover:scale-105">
+							联系我
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Skills -->
+	<section class="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+		<h2 class="text-2xl font-bold tracking-tight">技能栈</h2>
+		<p class="mt-2 text-muted-foreground">我日常使用的工具与技术</p>
+		<div class="mt-8 space-y-5">
+			{skills.map((s) => (
+				<div>
+					<div class="mb-2 flex items-center justify-between text-sm">
+						<span class="font-medium">{s.name}</span>
+						<span class="text-muted-foreground">{s.level}%</span>
+					</div>
+					<div class="h-2 overflow-hidden rounded-full bg-secondary">
+						<div class="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-1000" style={`width: ${s.level}%`}></div>
+					</div>
+				</div>
+			))}
+		</div>
+	</section>
+
+	<!-- Timeline -->
+	<section class="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+		<h2 class="text-2xl font-bold tracking-tight">成长历程</h2>
+		<p class="mt-2 text-muted-foreground">一路走来的关键节点</p>
+		<div class="mt-8 space-y-6">
+			{timeline.map((t, i) => (
+				<div class="relative flex gap-5 pl-2">
+					<div class="relative flex flex-col items-center">
+						<div class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary/20 bg-card text-xs font-bold text-primary">
+							{t.year}
+						</div>
+						{i < timeline.length - 1 && <div class="mt-2 w-px flex-1 bg-border"></div>}
+					</div>
+					<div class="pb-2">
+						<h3 class="font-semibold">{t.title}</h3>
+						<p class="mt-1 text-sm text-muted-foreground">{t.desc}</p>
+					</div>
+				</div>
+			))}
+		</div>
+	</section>
+
+	<!-- Social Promo -->
+	<section id="contact" class="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+		<h2 class="text-2xl font-bold tracking-tight">关注我的社交媒体</h2>
+		<p class="mt-2 text-muted-foreground">在以下平台与我互动，获取最新内容动态</p>
+
+		<div class="mt-8 grid gap-5 sm:grid-cols-3">
+			{socials.map((s) => (
+				<div class="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:shadow-xl hover:-translate-y-1">
+					<div class={`mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl ${s.color} text-white`} set:html={s.icon} />
+					<h3 class="text-lg font-bold">{s.name}</h3>
+					<p class="mt-1 text-sm font-medium text-primary">{s.handle}</p>
+					<p class="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+					<div class="mt-4 rounded-xl bg-secondary/50 p-3 text-center">
+						<p class="text-xs text-muted-foreground">扫码或搜索关注</p>
+						<div class="mx-auto mt-2 flex h-24 w-24 items-center justify-center rounded-lg border-2 border-dashed border-border text-xs text-muted-foreground">
+							二维码占位
+						</div>
+					</div>
+				</div>
+			))}
+		</div>
+	</section>
+
+	<!-- Contact CTA -->
+	<section class="mx-auto max-w-4xl px-4 py-12 sm:px-6">
+		<div class="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/5 via-card to-accent/5 p-8 text-center sm:p-12">
+			<div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-[80px]"></div>
+			<div class="relative">
+				<h2 class="text-2xl font-bold tracking-tight">合作与交流</h2>
+				<p class="mx-auto mt-3 max-w-lg text-muted-foreground">
+					如果你有项目合作、课程定制或技术交流的需求，欢迎通过以下方式联系我
+				</p>
+				<div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+					<a href="mailto:contact@example.com" class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-105">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+						发送邮件
+					</a>
+					<a href="/blog" class="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-6 py-3 text-sm font-medium transition-all hover:bg-secondary hover:scale-105">
+						浏览文章
+					</a>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>

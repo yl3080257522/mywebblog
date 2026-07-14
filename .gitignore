@@ -1,0 +1,25 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+.astro/
+
+# env
+.env
+.env.*
+!.env.example
+
+# logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# misc
+*.local
+.turbo

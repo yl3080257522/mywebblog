@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Ink Lab — cool mist + chlorophyll, avoid cream/purple AI defaults */
+    --background: 152 18% 97%;
+    --foreground: 168 28% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 168 28% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 168 28% 10%;
+    --primary: 158 48% 28%;
+    --primary-foreground: 150 30% 98%;
+    --secondary: 152 14% 92%;
+    --secondary-foreground: 168 22% 18%;
+    --muted: 152 12% 93%;
+    --muted-foreground: 165 10% 40%;
+    --accent: 28 86% 48%;
+    --accent-foreground: 30 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 155 14% 86%;
+    --input: 155 14% 86%;
+    --ring: 158 48% 28%;
+    --chart-1: 158 48% 28%;
+    --chart-2: 28 86% 48%;
+    --chart-3: 198 55% 42%;
+    --chart-4: 42 70% 50%;
+    --chart-5: 280 30% 45%;
+    --radius: 0.75rem;
+    --ink: 168 32% 9%;
+    --mist: 152 22% 94%;
+    --leaf: 152 55% 36%;
+  }
+  .dark {
+    --background: 168 25% 7%;
+    --foreground: 150 15% 92%;
+    --card: 168 22% 10%;
+    --card-foreground: 150 15% 92%;
+    --popover: 168 22% 10%;
+    --popover-foreground: 150 15% 92%;
+    --primary: 152 45% 48%;
+    --primary-foreground: 168 30% 8%;
+    --secondary: 168 16% 16%;
+    --secondary-foreground: 150 15% 92%;
+    --muted: 168 16% 16%;
+    --muted-foreground: 155 10% 62%;
+    --accent: 28 80% 52%;
+    --accent-foreground: 30 40% 98%;
+    --destructive: 0 62% 42%;
+    --destructive-foreground: 150 15% 92%;
+    --border: 168 14% 20%;
+    --input: 168 14% 20%;
+    --ring: 152 45% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    @apply bg-primary/20 text-primary;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .font-display {
+    font-family: "Syne", "Noto Sans SC", sans-serif;
+  }
+  .font-body {
+    font-family: "Noto Sans SC", "Syne", sans-serif;
+  }
+  .gradient-text {
+    background: linear-gradient(120deg, hsl(158 48% 22%), hsl(152 55% 38%), hsl(28 86% 48%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .atmosphere {
+    background:
+      radial-gradient(ellipse 90% 60% at 10% -10%, hsl(152 40% 70% / 0.28), transparent 55%),
+      radial-gradient(ellipse 70% 50% at 95% 15%, hsl(28 70% 70% / 0.16), transparent 50%),
+      radial-gradient(ellipse 60% 40% at 50% 100%, hsl(198 40% 70% / 0.12), transparent 55%),
+      linear-gradient(180deg, hsl(152 20% 97%), hsl(155 16% 94%));
+  }
+  .noise-overlay::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .glass {
+    background: hsl(152 20% 98% / 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+  .shadow-soft {
+    box-shadow: 0 1px 2px hsl(168 28% 10% / 0.04), 0 8px 24px hsl(168 28% 10% / 0.05);
+  }
+  .shadow-card {
+    box-shadow: 0 12px 40px hsl(168 28% 10% / 0.08);
+  }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes revealLine {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+.animate-float {
+  animation: floatSoft 6s ease-in-out infinite;
+}
+.animate-reveal-line {
+  transform-origin: left;
+  animation: revealLine 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}

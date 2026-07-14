@@ -1,0 +1,221 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { articles, categories } from '../../data/articles';
+
+const allCategories = ['全部', ...categories.map(c => c.name)];
+
+// Serialize article data for client-side search
+const articleData = articles.map(a => ({
+	slug: a.slug,
+	title: a.title,
+	excerpt: a.excerpt,
+	category: a.category,
+	date: a.date,
+	readTime: a.readTime,
+	tags: a.tags,
+	cover: a.cover,
+}));
+---
+
+<Layout title="博客 · 知识专栏">
+	<section class="pt-32 pb-10">
+		<div class="mx-auto max-w-6xl px-4 sm:px-6">
+			<div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+				<div>
+					<h1 class="text-3xl font-bold tracking-tight sm:text-4xl">全部文章</h1>
+					<p class="mt-2 text-muted-foreground">浏览所有原创内容，按分类筛选或搜索关键词</p>
+				</div>
+				<!-- Search bar -->
+				<div class="relative w-full max-w-sm">
+					<div class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-muted-foreground">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+						</svg>
+					</div>
+					<input
+						id="search-input"
+						type="text"
+						placeholder="搜索文章、标签..."
+						class="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-2.5 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground"
+					/>
+					<button id="search-clear" class="absolute inset-y-0 right-3 hidden items-center text-muted-foreground hover:text-foreground" aria-label="清除">
+						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+							<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Filter bar -->
+	<section class="mx-auto max-w-6xl px-4 sm:px-6">
+		<div id="filter-bar" class="flex flex-wrap gap-2 border-b border-border pb-6">
+			{allCategories.map((cat, i) => (
+				<button
+					data-category={cat}
+					class={`filter-btn rounded-xl px-4 py-2 text-sm font-medium transition-all ${i === 0 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-muted'}`}
+				>
+					{cat}
+				</button>
+			))}
+		</div>
+	</section>
+
+	<!-- Search status -->
+	<div id="search-status" class="mx-auto hidden max-w-6xl px-4 pt-6 sm:px-6">
+		<p class="text-sm text-muted-foreground">
+			搜索 "<span id="search-query-display" class="font-medium text-foreground"></span>" — 找到 <span id="search-count" class="font-medium text-foreground"></span> 篇文章
+		</p>
+	</div>
+
+	<!-- Articles grid -->
+	<section class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+		<div id="articles-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+		<div id="no-results" class="hidden py-24 text-center">
+			<div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary text-muted-foreground">
+				<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+				</svg>
+			</div>
+			<p class="text-lg font-medium">未找到相关文章</p>
+			<p class="mt-1 text-sm text-muted-foreground">试试其他关键词或切换分类</p>
+		</div>
+	</section>
+</Layout>
+
+<script define:vars={{ articleData, allCategories }}>
+	const params = new URLSearchParams(window.location.search);
+	let activeCategory = params.get('category') || '全部';
+	let searchQuery = params.get('q') || '';
+
+	const buttons = document.querySelectorAll('.filter-btn');
+	const grid = document.getElementById('articles-grid');
+	const noResults = document.getElementById('no-results');
+	const searchInput = document.getElementById('search-input');
+	const searchClear = document.getElementById('search-clear');
+	const searchStatus = document.getElementById('search-status');
+	const searchQueryDisplay = document.getElementById('search-query-display');
+	const searchCountEl = document.getElementById('search-count');
+
+	if (searchQuery && searchInput) {
+		searchInput.value = searchQuery;
+		searchClear.style.display = 'flex';
+	}
+	function slugify(text) {
+		return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+	}
+
+	function highlight(text, query) {
+		if (!query) return text;
+		const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		return text.replace(new RegExp(`(${escaped})`, 'gi'), '<mark class="bg-primary/15 text-primary rounded px-0.5">$1</mark>');
+	}
+
+	function renderCard(a, query) {
+		const title = highlight(a.title, query);
+		const excerpt = highlight(a.excerpt, query);
+		const tagsHtml = a.tags.slice(0, 2).map(t => {
+			const tagText = query && t.toLowerCase().includes(query.toLowerCase())
+				? highlight('#' + t, query)
+				: '#' + t;
+			return `<span class="rounded-md bg-secondary px-2 py-0.5 text-xs text-muted-foreground">${tagText}</span>`;
+		}).join('');
+
+		return `
+			<a href="/blog/${a.slug}"
+				class="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-card hover:-translate-y-1">
+				<div class="aspect-[16/9] overflow-hidden">
+					<img src="${a.cover}" alt="${a.title}" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
+				</div>
+				<div class="flex flex-1 flex-col p-5">
+					<div class="mb-3 flex items-center gap-2 text-xs">
+						<span class="rounded-full bg-primary/10 px-2.5 py-0.5 font-medium text-primary">${a.category}</span>
+						<span class="text-muted-foreground">${a.date}</span>
+					</div>
+					<h3 class="text-lg font-bold leading-snug transition-colors group-hover:text-primary">${title}</h3>
+					<p class="mt-2 flex-1 text-sm text-muted-foreground leading-relaxed line-clamp-3">${excerpt}</p>
+					<div class="mt-4 flex items-center justify-between">
+						<div class="flex flex-wrap gap-1">${tagsHtml}</div>
+						<span class="text-xs text-muted-foreground">${a.readTime}</span>
+					</div>
+				</div>
+			</a>`;
+	}
+
+	function render() {
+		const q = searchQuery.trim().toLowerCase();
+
+		const filtered = articleData.filter(a => {
+			const matchesCat = activeCategory === '全部' || a.category === activeCategory;
+			if (!matchesCat) return false;
+			if (!q) return true;
+			return (
+				a.title.toLowerCase().includes(q) ||
+				a.excerpt.toLowerCase().includes(q) ||
+				a.tags.some(t => t.toLowerCase().includes(q))
+			);
+		});
+
+		grid.innerHTML = filtered.map(a => renderCard(a, searchQuery.trim())).join('');
+		noResults.classList.toggle('hidden', filtered.length > 0);
+
+		// Search status
+		if (q) {
+			searchStatus.classList.remove('hidden');
+			searchQueryDisplay.textContent = searchQuery.trim();
+			searchCountEl.textContent = String(filtered.length);
+		} else {
+			searchStatus.classList.add('hidden');
+		}
+	}
+
+	function setActiveCategory(category) {
+		activeCategory = category;
+		buttons.forEach(btn => {
+			if (btn.dataset.category === category) {
+				btn.classList.add('bg-primary', 'text-primary-foreground');
+				btn.classList.remove('bg-secondary', 'text-secondary-foreground');
+			} else {
+				btn.classList.remove('bg-primary', 'text-primary-foreground');
+				btn.classList.add('bg-secondary', 'text-secondary-foreground');
+			}
+		});
+		const url = new URL(window.location.href);
+		if (category === '全部') url.searchParams.delete('category');
+		else url.searchParams.set('category', category);
+		window.history.replaceState({}, '', url);
+		render();
+	}
+
+	buttons.forEach(btn => {
+		btn.addEventListener('click', () => setActiveCategory(btn.dataset.category));
+	});
+
+	let debounceTimer;
+	searchInput.addEventListener('input', (e) => {
+		searchQuery = e.target.value;
+		searchClear.style.display = searchQuery ? 'flex' : 'none';
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(render, 120);
+	});
+
+	searchClear.addEventListener('click', () => {
+		searchInput.value = '';
+		searchQuery = '';
+		searchClear.style.display = 'none';
+		render();
+		searchInput.focus();
+	});
+
+	// Keyboard shortcut: Cmd/Ctrl + K
+	document.addEventListener('keydown', (e) => {
+		if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+			e.preventDefault();
+			searchInput.focus();
+			searchInput.select();
+		}
+	});
+
+	setActiveCategory(activeCategory);
+</script>
