@@ -4,18 +4,34 @@ import '../styles/globals.css';
 interface Props {
   title: string;
   description?: string;
+  /** 分享图：完整 https URL，或站内相对路径 */
+  image?: string;
+  /** Open Graph 类型，文章页用 article */
+  type?: 'website' | 'article';
   hideFooter?: boolean;
 }
 
 const {
   title,
   description = '个人专栏 · 知识分享 · 系统教程 · 项目实战',
+  image,
+  type = 'website',
   hideFooter = false,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
 const category = Astro.url.searchParams.get('category');
 const year = new Date().getFullYear();
+
+const site = Astro.site ?? new URL('https://rstudyhub.online');
+const canonicalURL = new URL(Astro.url.pathname, site).href;
+const ogImage = image
+  ? image.startsWith('http://') || image.startsWith('https://')
+    ? image
+    : new URL(image, site).href
+  : undefined;
+const twitterCard = ogImage ? 'summary_large_image' : 'summary';
+const siteName = '知识专栏';
 
 const isHome = pathname === '/' || pathname === '';
 const isBlogList = pathname === '/blog' || pathname === '/blog/';
@@ -52,8 +68,25 @@ const navItems = [
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="canonical" href={canonicalURL} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content={type} />
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:locale" content="zh_CN" />
+		{ogImage && <meta property="og:image" content={ogImage} />}
+
+		<!-- Twitter / X Card -->
+		<meta name="twitter:card" content={twitterCard} />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		{ogImage && <meta name="twitter:image" content={ogImage} />}
+
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link

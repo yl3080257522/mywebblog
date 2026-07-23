@@ -84,7 +84,13 @@ const tocItems = headingMatches.map(m => ({
 }));
 ---
 
-<Layout title={`${article.title} · 知识专栏`} description={article.excerpt} hideFooter>
+<Layout
+	title={`${article.title} · 知识专栏`}
+	description={article.excerpt}
+	image={article.cover}
+	type="article"
+	hideFooter
+>
 	<!-- Full-height flex layout: TOC left, content right with internal scroll -->
 	<div class="flex h-dvh overflow-hidden pt-[4.5rem]">
 		<!-- TOC Sidebar (left, full height) -->
