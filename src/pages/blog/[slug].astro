@@ -43,11 +43,11 @@ function renderMarkdown(content: string): string {
 
 	html = html.replace(/^### (.+)$/gm, (_, text) => {
 		const id = slugifyHeading(text);
-		return `<h3 id="${id}" data-toc class="text-xl font-bold mt-8 mb-3 scroll-mt-6">${renderInline(text)}</h3>`;
+		return `<h3 id="${id}" data-toc class="text-xl font-bold mt-8 mb-3 scroll-mt-24">${renderInline(text)}</h3>`;
 	});
 	html = html.replace(/^## (.+)$/gm, (_, text) => {
 		const id = slugifyHeading(text);
-		return `<h2 id="${id}" data-toc class="text-2xl font-bold mt-10 mb-4 scroll-mt-6">${renderInline(text)}</h2>`;
+		return `<h2 id="${id}" data-toc class="text-2xl font-bold mt-10 mb-4 scroll-mt-24">${renderInline(text)}</h2>`;
 	});
 
 	html = html.replace(/^(?:- .+(?:\n|$))+/gm, (match) => {
@@ -91,43 +91,45 @@ const tocItems = headingMatches.map(m => ({
 	type="article"
 	hideFooter
 >
-	<!-- Full-height flex layout: TOC left, content right with internal scroll -->
+	<!-- Content stays centered; TOC sits immediately to its left -->
 	<div class="flex h-dvh overflow-hidden pt-[4.5rem]">
-		<!-- TOC Sidebar (left, full height) -->
-		<aside class="hidden w-64 shrink-0 flex-col border-r border-border bg-card/30 md:flex">
-			<div class="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+		<div class="hidden min-w-0 flex-1 md:block" aria-hidden="true"></div>
+
+		<!-- TOC — pulled next to the article column -->
+		<aside class="hidden w-52 shrink-0 flex-col border-r border-border bg-card/30 lg:w-56 md:flex">
+			<div class="flex items-center gap-2.5 px-4 py-4 border-b border-border">
 				<a href="/blog" class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
 					返回博客
 				</a>
 			</div>
-			<div class="flex-1 overflow-y-auto px-5 py-5">
-				<p class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">目录</p>
+			<div class="flex-1 overflow-y-auto px-3 py-5">
+				<p class="mb-3 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">目录</p>
 				<nav id="toc-nav" class="space-y-0.5">
 					{tocItems.length > 0 ? tocItems.map((item) => (
 						<a
 							href={`#${item.id}`}
 							data-toc-link={item.id}
 							class:list={[
-								'toc-link block border-l-2 border-border py-1.5 text-sm transition-colors hover:text-primary',
-								item.level === 2 ? 'pl-3 font-medium' : 'pl-6 text-muted-foreground',
+								'toc-link block rounded-r-md border-l-2 border-transparent py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground',
+								item.level === 2 ? 'pl-3 font-medium' : 'pl-5',
 							]}
 						>
 							{item.text}
 						</a>
 					)) : (
-						<p class="text-sm text-muted-foreground">本文暂无目录</p>
+						<p class="px-2 text-sm text-muted-foreground">本文暂无目录</p>
 					)}
 				</nav>
 			</div>
-			<div class="border-t border-border px-5 py-3">
+			<div class="border-t border-border px-4 py-3">
 				<p class="text-xs text-muted-foreground">在博客页用 Ctrl/Cmd + K 搜索</p>
 			</div>
 		</aside>
 
-		<!-- Content (right, internal scroll) -->
-		<div class="flex-1 overflow-y-auto">
-			<div class="mx-auto max-w-4xl px-6 py-8 sm:px-10 sm:py-10">
+		<!-- Article column — same centered max width as before -->
+		<div id="article-scroll" class="w-full max-w-4xl shrink overflow-y-auto">
+			<div class="px-6 py-8 sm:px-10 sm:py-10">
 				<!-- Breadcrumb -->
 				<nav class="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
 					<a href="/" class="hover:text-foreground">首页</a>
@@ -205,62 +207,87 @@ const tocItems = headingMatches.map(m => ({
 				</div>
 			</div>
 		</div>
+
+		<div class="hidden min-w-0 flex-1 md:block" aria-hidden="true"></div>
 	</div>
 </Layout>
 
+<style is:global>
+	.toc-link.is-active {
+		border-left-color: hsl(var(--primary));
+		background-color: hsl(var(--primary) / 0.08);
+		color: hsl(var(--primary));
+		font-weight: 600;
+	}
+</style>
+
 <script>
-	// Scroll-spy: highlight current TOC item based on content scroll
-	const headings = document.querySelectorAll('[data-toc]');
-	const tocLinks = document.querySelectorAll('[data-toc-link]');
-	const scrollContainer = document.querySelector('.flex-1.overflow-y-auto');
+	const headings = Array.from(document.querySelectorAll('[data-toc]'));
+	const tocLinks = Array.from(document.querySelectorAll('[data-toc-link]'));
+	const scrollContainer = document.getElementById('article-scroll');
 
-	if (headings.length > 0 && tocLinks.length > 0) {
-		const linkMap = new Map();
-		tocLinks.forEach(link => {
-			linkMap.set(link.dataset.tocLink, link);
+	function setActive(id) {
+		tocLinks.forEach((link) => {
+			const active = link.getAttribute('data-toc-link') === id;
+			link.classList.toggle('is-active', active);
 		});
+	}
 
-		function updateActive() {
-			if (!scrollContainer) return;
-			const containerTop = 0;
-			let activeId = null;
+	function getScrollTopFor(target) {
+		if (!scrollContainer) return 0;
+		const containerRect = scrollContainer.getBoundingClientRect();
+		const targetRect = target.getBoundingClientRect();
+		return targetRect.top - containerRect.top + scrollContainer.scrollTop - 24;
+	}
 
-			headings.forEach(h => {
-				const rect = h.getBoundingClientRect();
-				if (rect.top <= 80) {
-					activeId = h.id;
-				}
-			});
+	function updateActiveFromScroll() {
+		if (!scrollContainer || headings.length === 0) return;
 
-			if (activeId) {
-				tocLinks.forEach(link => {
-					link.classList.remove('border-primary', 'text-primary', 'bg-primary/5');
-					link.classList.add('border-border');
-				});
-				const activeLink = linkMap.get(activeId);
-				if (activeLink) {
-					activeLink.classList.add('border-primary', 'text-primary', 'bg-primary/5');
-					activeLink.classList.remove('border-border');
-				}
+		const marker = scrollContainer.getBoundingClientRect().top + 96;
+		let activeId = headings[0].id;
+
+		for (const heading of headings) {
+			if (heading.getBoundingClientRect().top <= marker) {
+				activeId = heading.id;
+			} else {
+				break;
 			}
 		}
 
-		scrollContainer?.addEventListener('scroll', updateActive);
-		updateActive();
+		setActive(activeId);
 	}
 
-	// Smooth scroll within the container
-	tocLinks.forEach((link) => {
-		link.addEventListener('click', (e) => {
-			e.preventDefault();
-			const href = link.getAttribute('href');
-			if (!href) return;
-			const target = document.getElementById(href.slice(1));
-			if (target && scrollContainer) {
-				const offset = 24;
-				const top = (target as HTMLElement).offsetTop - offset;
-				scrollContainer.scrollTo({ top, behavior: 'smooth' });
-			}
+	if (headings.length > 0 && tocLinks.length > 0 && scrollContainer) {
+		scrollContainer.addEventListener('scroll', updateActiveFromScroll, { passive: true });
+		updateActiveFromScroll();
+
+		tocLinks.forEach((link) => {
+			link.addEventListener('click', (e) => {
+				e.preventDefault();
+				const id = link.getAttribute('data-toc-link');
+				if (!id) return;
+				const target = document.getElementById(id);
+				if (!target) return;
+
+				scrollContainer.scrollTo({
+					top: getScrollTopFor(target),
+					behavior: 'smooth',
+				});
+				setActive(id);
+				history.replaceState(null, '', `#${id}`);
+			});
 		});
-	});
+
+		// Honor hash on load
+		const hash = decodeURIComponent(location.hash.slice(1));
+		if (hash) {
+			const target = document.getElementById(hash);
+			if (target) {
+				requestAnimationFrame(() => {
+					scrollContainer.scrollTo({ top: getScrollTopFor(target) });
+					setActive(hash);
+				});
+			}
+		}
+	}
 </script>

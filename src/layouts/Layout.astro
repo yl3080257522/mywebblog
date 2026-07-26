@@ -38,23 +38,28 @@ const isBlogList = pathname === '/blog' || pathname === '/blog/';
 const isProjects = pathname.startsWith('/projects');
 const navItems = [
   {
+    key: 'home',
     href: '/',
     label: '首页',
     match: () => isHome,
   },
   {
+    key: 'blog',
     href: '/blog',
     label: '博客',
     match: () =>
       pathname.startsWith('/blog') &&
-      category !== '系统教程',
+      category !== '系统教程' &&
+      category !== '项目实战',
   },
   {
-    href: '/blog?category=系统教程',
+    key: 'tutorial',
+    href: `/blog?category=${encodeURIComponent('系统教程')}`,
     label: '系统教程',
     match: () => isBlogList && category === '系统教程',
   },
   {
+    key: 'projects',
     href: '/projects',
     label: '项目实战',
     match: () => isProjects || (isBlogList && category === '项目实战'),
@@ -119,6 +124,7 @@ const navItems = [
 						{navItems.map((item) => (
 							<a
 								href={item.href}
+								data-nav={item.key}
 								class:list={[
 									'nav-link rounded-lg px-3.5 py-2 text-sm font-medium transition-colors',
 									item.match() ? 'nav-link-active' : '',
@@ -157,7 +163,14 @@ const navItems = [
 				>
 					<div class="flex flex-col gap-1">
 						{navItems.map((item) => (
-							<a href={item.href} class="rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-secondary">
+							<a
+								href={item.href}
+								data-nav={item.key}
+								class:list={[
+									'rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-secondary',
+									item.match() ? 'bg-secondary' : '',
+								]}
+							>
 								{item.label}
 							</a>
 						))}
@@ -216,6 +229,43 @@ const navItems = [
 			toggle?.addEventListener('click', () => {
 				const open = menu?.classList.toggle('hidden') === false;
 				toggle.setAttribute('aria-expanded', String(open));
+			});
+
+			function isBlogListPath(path) {
+				return path === '/blog' || path === '/blog/';
+			}
+
+			function syncNavActive() {
+				const path = window.location.pathname;
+				const category = new URLSearchParams(window.location.search).get('category');
+
+				const activeKey = (() => {
+					if (path === '/' || path === '') return 'home';
+					if (isBlogListPath(path) && category === '系统教程') return 'tutorial';
+					if (path.startsWith('/projects') || (isBlogListPath(path) && category === '项目实战')) return 'projects';
+					if (path.startsWith('/blog')) return 'blog';
+					return null;
+				})();
+
+				document.querySelectorAll('[data-nav]').forEach((link) => {
+					const active = link.getAttribute('data-nav') === activeKey;
+					link.classList.toggle('nav-link-active', active);
+					if (link.closest('#mobile-menu')) {
+						link.classList.toggle('bg-secondary', active);
+					}
+				});
+			}
+
+			syncNavActive();
+			window.addEventListener('popstate', syncNavActive);
+
+			['pushState', 'replaceState'].forEach((method) => {
+				const original = history[method].bind(history);
+				history[method] = (...args) => {
+					const result = original(...args);
+					syncNavActive();
+					return result;
+				};
 			});
 		</script>
 	</body>

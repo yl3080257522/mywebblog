@@ -1,0 +1,6 @@
+# 告诉搜索引擎：哪些页面可以抓取，以及网站地图在哪
+User-agent: *
+Allow: /
+
+# 站点地图（构建后由 @astrojs/sitemap 生成）
+Sitemap: https://rstudyhub.online/sitemap-index.xml
