@@ -1,0 +1,35 @@
+---
+description: 博客文章代码块的展示风格与写法规范
+alwaysApply: true
+---
+
+# 博客代码块规范
+
+撰写或修改 `src/data/articles.ts` 等文章里的 Markdown 代码块时，遵循下列约定。站点渲染为深色 macOS 窗口风格（红黄绿三键 + 深色语法高亮）。
+
+## 视觉（由页面渲染，作者无需手写 HTML）
+
+- 深色背景代码窗，左上角红 / 黄 / 绿窗口按钮
+- 关键词、字符串、函数、注释分区着色
+- 等宽字体，内容紧凑
+
+## 写法
+
+1. **按功能分组**：import、数据处理、绑图/输出等同一职责的代码放在一起。
+2. **少空行**：非必要不加空行；仅在大块功能分界处保留一行空行（如 import 与主逻辑之间）。
+3. **注释跟在细节后面**：某个功能或关键参数写完后，立刻用行尾注释或紧随其后的注释说明用途，不要把大段说明甩到离代码很远的地方。
+
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.boxplot(x="condition", y="expression", data=df, palette="Set3")  # 按实验条件画表达量箱线图
+plt.title("Gene Expression Across Conditions")  # 设置图标题
+plt.show()
+```
+
+## 反例
+
+- 功能相关的几行之间随意插很多空行
+- 只有 `点击这里` 式说明、或注释与对应代码隔开太远
+- 为「好看」堆砌无意义空行或重复注释

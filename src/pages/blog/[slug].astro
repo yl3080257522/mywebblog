@@ -23,6 +23,69 @@ function escapeHtml(text: string): string {
 	return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/** 轻量语法高亮：关键词紫、字符串黄绿、函数青、注释灰 */
+function highlightCode(code: string, lang = ''): string {
+	const keywords: Record<string, string[]> = {
+		python: ['import', 'from', 'as', 'def', 'class', 'return', 'if', 'elif', 'else', 'for', 'while', 'in', 'not', 'and', 'or', 'with', 'try', 'except', 'True', 'False', 'None', 'lambda', 'pass', 'yield', 'async', 'await'],
+		r: ['library', 'require', 'function', 'if', 'else', 'for', 'while', 'in', 'TRUE', 'FALSE', 'NULL', 'NA', 'return'],
+		js: ['import', 'from', 'export', 'default', 'const', 'let', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'of', 'in', 'class', 'new', 'async', 'await', 'true', 'false', 'null'],
+		ts: ['import', 'from', 'export', 'default', 'const', 'let', 'var', 'function', 'return', 'if', 'else', 'for', 'while', 'of', 'in', 'class', 'new', 'async', 'await', 'true', 'false', 'null', 'type', 'interface'],
+		bash: ['if', 'then', 'fi', 'for', 'do', 'done', 'in', 'echo', 'cd', 'npm', 'npx'],
+	};
+	const key = lang.toLowerCase().replace(/^\./, '');
+	const alias: Record<string, string> = { py: 'python', javascript: 'js', typescript: 'ts', shell: 'bash', sh: 'bash', zsh: 'bash' };
+	const dictKey = alias[key] || (keywords[key] ? key : 'python');
+	const kw = keywords[dictKey] || keywords.python;
+	const hashComment = dictKey === 'python' || dictKey === 'r' || dictKey === 'bash';
+	const kwList = kw.join('|');
+	const highlightPlain = (plain: string) =>
+		escapeHtml(plain)
+			.replace(/\b([A-Za-z_][\w]*)\s*(?=\()/g, '<span class="tok-fn">$1</span>')
+			.replace(new RegExp(`\\b(${kwList})\\b`, 'g'), '<span class="tok-kw">$1</span>');
+
+	return code.split('\n').map((line) => {
+		let codePart = line;
+		let comment = '';
+		const mark = hashComment ? '#' : '//';
+		const idx = line.indexOf(mark);
+		if (idx >= 0) {
+			const before = line.slice(0, idx);
+			const quoteCount = (before.match(/['"]/g) || []).length;
+			if (quoteCount % 2 === 0) {
+				codePart = before;
+				comment = line.slice(idx);
+			}
+		}
+
+		let html = '';
+		let last = 0;
+		const strRe = /(["'])(?:\\.|(?!\1).)*\1/g;
+		for (const m of codePart.matchAll(strRe)) {
+			if (m.index == null) continue;
+			html += highlightPlain(codePart.slice(last, m.index));
+			html += `<span class="tok-string">${escapeHtml(m[0])}</span>`;
+			last = m.index + m[0].length;
+		}
+		html += highlightPlain(codePart.slice(last));
+		if (comment) html += `<span class="tok-comment">${escapeHtml(comment)}</span>`;
+		return html;
+	}).join('\n');
+}
+
+function renderCodeBlock(lang: string | undefined, code: string): string {
+	const body = highlightCode(code.replace(/\n$/, ''), lang || '');
+	const label = lang ? `<span class="code-lang">${escapeHtml(lang)}</span>` : '';
+	return `<div class="code-window my-5 overflow-hidden rounded-xl border border-white/10 shadow-soft">
+		<div class="code-window-bar flex items-center gap-2 px-4 py-3">
+			<span class="code-dot code-dot-red"></span>
+			<span class="code-dot code-dot-yellow"></span>
+			<span class="code-dot code-dot-green"></span>
+			${label}
+		</div>
+		<pre class="code-window-body overflow-x-auto px-4 pb-4 pt-1"><code class="text-[13px] leading-[1.55] font-mono">${body}</code></pre>
+	</div>`;
+}
+
 function renderInline(text: string): string {
 	return text
 		.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline underline-offset-2 hover:opacity-80" rel="noopener noreferrer">$1</a>')
@@ -32,13 +95,18 @@ function renderInline(text: string): string {
 
 function renderMarkdown(content: string): string {
 	let html = content.replace(/\r\n/g, '\n');
+	const blocks: string[] = [];
+	const stash = (fragment: string) => {
+		const key = `%%BLOCK_${blocks.length}%%`;
+		blocks.push(fragment);
+		return key;
+	};
 
-	html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, _lang, code) => {
-		return `<pre class="rounded-xl border border-border bg-secondary/50 p-4 overflow-x-auto my-4"><code class="text-sm font-mono">${escapeHtml(code.replace(/\n$/, ''))}</code></pre>`;
-	});
+	// 先抽出代码块，避免后续按行处理把代码行包进 <p> 造成巨大行距
+	html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => stash(renderCodeBlock(lang, code)));
 
 	html = html.replace(/\$\$([\s\S]+?)\$\$/g, (_, formula) => {
-		return `<div class="my-4 overflow-x-auto rounded-xl border border-border bg-secondary/30 p-4 text-center font-mono text-sm">${escapeHtml(formula.trim())}</div>`;
+		return stash(`<div class="my-4 overflow-x-auto rounded-xl border border-border bg-secondary/30 p-4 text-center font-mono text-sm">${escapeHtml(formula.trim())}</div>`);
 	});
 
 	html = html.replace(/^### (.+)$/gm, (_, text) => {
@@ -64,14 +132,25 @@ function renderMarkdown(content: string): string {
 		return `<ol class="my-4 space-y-1.5 text-muted-foreground">${items}</ol>`;
 	});
 
+	// 独立成行的图片 / GIF：![说明](url)
+	html = html.replace(/^!\[([^\]]*)\]\(([^)]+)\)(?:\{([^}]+)\})?$/gm, (_, alt, src, caption) => {
+		const cap = caption || alt;
+		const isSvg = /\.svg$/i.test(src);
+		const imgClass = isSvg ? 'w-full h-auto bg-[#f4f7f5]' : 'w-full object-cover';
+		return stash(`<figure class="article-media my-6 overflow-hidden rounded-2xl border border-border bg-card">
+			<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" class="${imgClass}" loading="lazy" />
+			${cap ? `<figcaption class="border-t border-border px-4 py-2.5 text-center text-sm text-muted-foreground">${escapeHtml(cap)}</figcaption>` : ''}
+		</figure>`);
+	});
+
 	html = html.split('\n').map((line) => {
 		const trimmed = line.trim();
 		if (!trimmed) return '';
-		if (trimmed.startsWith('<')) return trimmed;
+		if (trimmed.startsWith('<') || /^%%BLOCK_\d+%%$/.test(trimmed)) return trimmed;
 		return `<p class="my-3 leading-relaxed text-muted-foreground">${renderInline(trimmed)}</p>`;
 	}).join('\n');
 
-	return html;
+	return html.replace(/%%BLOCK_(\d+)%%/g, (_, i) => blocks[Number(i)]);
 }
 
 const renderedContent = renderMarkdown(article.content);
@@ -219,6 +298,46 @@ const tocItems = headingMatches.map(m => ({
 		color: hsl(var(--primary));
 		font-weight: 600;
 	}
+
+	/* 文章代码块：深色 macOS 窗口风格 */
+	.code-window {
+		background: #2b2b2b;
+		color: #e8e8e8;
+	}
+	.code-window-bar {
+		background: #323232;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	}
+	.code-dot {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: 9999px;
+	}
+	.code-dot-red { background: #ff5f57; }
+	.code-dot-yellow { background: #febc2e; }
+	.code-dot-green { background: #28c840; }
+	.code-lang {
+		margin-left: auto;
+		font-size: 11px;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.35);
+		font-family: "JetBrains Mono", Menlo, Monaco, monospace;
+	}
+	.code-window-body {
+		margin: 0;
+		background: transparent;
+		color: #e8e8e8;
+	}
+	.code-window-body code {
+		font-family: "JetBrains Mono", Menlo, Monaco, monospace;
+		white-space: pre;
+	}
+	.tok-kw { color: #c678dd; }
+	.tok-string { color: #c3e88d; }
+	.tok-fn { color: #82aaff; }
+	.tok-comment { color: #7f848e; }
 </style>
 
 <script>

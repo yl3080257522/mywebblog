@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="R concepts">
+  <rect width="960" height="540" rx="24" fill="#f4f7f5"/>
+  <text x="480" y="70" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="30" font-weight="700" fill="#1a2e24">R: compute, stats, visualization</text>
+  <rect x="60" y="120" width="260" height="320" rx="16" fill="#fff" stroke="#d5e0da"/>
+  <text x="190" y="170" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="22" font-weight="700" fill="#276749">Vectors</text>
+  <text x="190" y="220" text-anchor="middle" font-family="monospace" font-size="15" fill="#3d5248">x &lt;- c(1, 2, 3)</text>
+  <text x="190" y="270" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="15" fill="#5a6f65">assignment + vectors</text>
+  <rect x="350" y="120" width="260" height="320" rx="16" fill="#fff" stroke="#d5e0da"/>
+  <text x="480" y="170" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="22" font-weight="700" fill="#c2410c">data.frame</text>
+  <text x="480" y="240" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="15" fill="#5a6f65">like a spreadsheet</text>
+  <text x="480" y="280" text-anchor="middle" font-family="monospace" font-size="14" fill="#3d5248">head(df)</text>
+  <rect x="640" y="120" width="260" height="320" rx="16" fill="#fff" stroke="#d5e0da"/>
+  <text x="770" y="170" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="22" font-weight="700" fill="#1d4ed8">Functions</text>
+  <text x="770" y="240" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="15" fill="#5a6f65">summary / lm / ggplot</text>
+  <rect x="700" y="310" width="140" height="70" rx="8" fill="#276749">
+    <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite"/>
+  </rect>
+</svg>

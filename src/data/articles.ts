@@ -22,6 +22,270 @@ export const categories: { name: Category; description: string; icon: string }[]
 
 export const articles: Article[] = [
   {
+    slug: "r-rstudio-setup-guide",
+    title: "R 与 RStudio 安装配置全流程（Windows）",
+    excerpt: "从 CRAN 下载 R、安装 RStudio、配置 Rtools 与国内镜像，按步骤配好可复现的数据分析环境。",
+    category: "系统教程",
+    date: "2026-07-26",
+    readTime: "18 分钟",
+    tags: ["R", "RStudio", "环境配置", "Windows"],
+    cover: "https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: true,
+    content: `## 写在前面
+
+本篇参考常见安装教程的结构（如[腾讯云社区这篇 R / RStudio 配置文](https://cloud.tencent.com/developer/article/2139514)）：按操作拆步骤，配示意图与动效，方便边看边装。完成后你将拥有：R 本体、RStudio 编辑器、Rtools（编译依赖）、国内 CRAN 镜像。
+
+## 一、安装 R
+
+R 是开源的统计计算与可视化平台。打开官网 [https://cran.r-project.org/](https://cran.r-project.org/)，选择 **Download R for Windows** → **base**，下载当前稳定版安装包。
+
+![点击 Download R for Windows（安装步骤示意）](/tutorials/r/cran-download-demo.svg)
+
+安装时建议：
+
+- 自定义目录（避免纯中文路径）
+- 勾选创建桌面快捷方式，方便检查版本
+
+装完后在开始菜单打开 R，能进入控制台即表示本体安装成功。
+
+## 二、安装 RStudio
+
+去 [posit.co/download/rstudio-desktop](https://posit.co/download/rstudio-desktop/) 下载 **RStudio Desktop Free**，安装完成后打开。若看不到脚本编辑区：菜单 **View → Panes → Show All Panes**。
+
+![RStudio 四窗格界面示意（控制台光标闪烁）](/tutorials/r/rstudio-panes-demo.svg)
+
+永久改工作目录（项目默认保存位置）：**Session → Set Working Directory → Choose Directory**，或在控制台执行：
+
+\`\`\`r
+setwd("D:/R/projects")  # 改成你的项目目录
+getwd()  # 确认当前工作目录
+\`\`\`
+
+## 三、配置国内镜像
+
+装包慢时，把 CRAN 换成国内节点：**Tools → Global Options → Packages → Change**，优先选带 **China** 且离你近的镜像 → **Apply**（可能会提示重启）。
+
+![选择 China CRAN 镜像（高亮动效）](/tutorials/r/mirror-setup-demo.svg)
+
+也可在用户目录写入默认镜像（重启后生效）：
+
+\`\`\`r
+options(repos = c(CRAN = "https://mirrors.tuna.tsinghua.edu.cn/CRAN/"))  # 清华源示例
+\`\`\`
+
+## 四、安装并绑定 Rtools
+
+Windows 上编译部分源码包需要 **Rtools**。仍在 CRAN Windows 页面下载与当前 R 主版本匹配的 Rtools，安装后在 RStudio 控制台执行：
+
+\`\`\`r
+writeLines('PATH="\${RTOOLS40_HOME}\\usr\\bin;\${PATH}"', con = "~/.Renviron")  # 写入 Rtools 路径
+\`\`\`
+
+重启 RStudio，再检查：
+
+\`\`\`r
+Sys.which("make")  # 应指向 Rtools 下的 make
+.libPaths()  # 查看包安装目录
+\`\`\`
+
+## 五、验证环境
+
+\`\`\`r
+install.packages(c("jsonlite", "ggplot2", "dplyr"))  # 试装几个常用包
+library(ggplot2)
+library(dplyr)
+sessionInfo()  # 确认 R / 包版本
+\`\`\`
+
+若 C 盘空间紧张，可指定下载缓存目录（先手动建好文件夹）：
+
+\`\`\`r
+install.packages("ggplot2", destdir = "D:/R/downloaded_packages/")  # 安装包缓存到 D 盘
+\`\`\`
+
+## 六、可选：Jupyter 里跑 R
+
+若已使用 Anaconda / Jupyter，可在 R 中安装并注册内核：
+
+\`\`\`r
+install.packages("IRkernel")
+IRkernel::installspec()  # 注册 R kernel 到 Jupyter
+\`\`\`
+
+重新打开 Jupyter Notebook，新建笔记本时应能看到 **R** 内核。
+
+## 系列下一篇
+
+环境就绪后，建议继续阅读：[R 语言入门导览：对象、函数与工作流](/blog/r-language-introduction)。`,
+  },
+  {
+    slug: "r-language-introduction",
+    title: "R 语言入门导览：对象、函数与工作流",
+    excerpt: "在配好 RStudio 之后，用最短路径认识向量、数据框、函数与一次完整的读数—分析—出图流程。",
+    category: "系统教程",
+    date: "2026-07-26",
+    readTime: "16 分钟",
+    tags: ["R", "基础语法", "tidyverse", "入门"],
+    cover: "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=800",
+    featured: true,
+    content: `## 这篇解决什么问题
+
+上一篇我们完成了 [R / RStudio 安装配置](/blog/r-rstudio-setup-guide)。本篇不再纠结安装，而是建立心智模型：R 里数据怎么存、代码怎么写、一次分析怎么跑通。
+
+![R 的三大核心：向量、数据框、函数](/tutorials/r/r-concepts.svg)
+
+## 一、R 的基本世界观
+
+- **赋值**：用 \`<-\`（或 \`=\`）把结果存进对象名
+- **向量**：同类型元素排成一列，是多数计算的基础
+- **数据框 data.frame / tibble**：像表格，列是变量，行是观测
+- **函数**：\`函数名(参数)\`；包用 \`library()\` 加载
+
+\`\`\`r
+x <- c(10, 20, 30, 40)  # 数值向量
+mean(x)  # 对向量做汇总
+df <- data.frame(name = c("A", "B"), score = c(88, 92))  # 迷你数据框
+print(df)
+\`\`\`
+
+## 二、认识 RStudio 四个窗格
+
+![四窗格：脚本 / 环境 / 控制台 / 图](/tutorials/r/rstudio-panes-demo.svg)
+
+操作建议：
+
+- 在 **Source** 写脚本，\`Ctrl+Enter\` 发送当前行到 Console
+- 在 **Environment** 看有哪些对象
+- **Plots** 查看图形；**Help** 查函数说明（如 \`?mean\`）
+
+## 三、一次最小工作流
+
+读入 → 查看 → 汇总 → 出图（示例用内置数据，无需外网文件）：
+
+\`\`\`r
+data(mtcars)
+head(mtcars)  # 看前几行
+summary(mtcars$mpg)  # 对 mpg 做描述统计
+plot(mtcars$wt, mtcars$mpg, main = "Weight vs MPG")  # 基础散点图
+\`\`\`
+
+更现代的写法（需已安装 ggplot2）：
+
+\`\`\`r
+library(ggplot2)
+ggplot(mtcars, aes(wt, mpg)) +
+  geom_point(color = "#276749") +  # 散点
+  labs(title = "Weight vs MPG", x = "Weight", y = "Miles per gallon")
+\`\`\`
+
+## 四、包与帮助系统
+
+\`\`\`r
+install.packages("dplyr")  # 安装（只需一次）
+library(dplyr)  # 每个会话加载一次
+?filter  # 打开帮助页
+vignette(package = "dplyr")  # 查看长文教程列表
+\`\`\`
+
+常用入门包：\`dplyr\`（整理）、\`ggplot2\`（作图）、\`readr\`（读 csv）、\`tidyr\`（长短表转换）。
+
+## 五、脚本与可复现
+
+把分析写成 \`.R\` 脚本或 Quarto/R Markdown，避免只在控制台临时敲：
+
+\`\`\`r
+# analysis.R
+library(ggplot2)
+p <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_boxplot()
+ggsave("mpg_by_cyl.png", p, width = 6, height = 4)  # 导出图片
+\`\`\`
+
+## 系列导航
+
+- 上一篇：[R 与 RStudio 安装配置](/blog/r-rstudio-setup-guide)
+- 下一篇：[如何系统学习 R 语言](/blog/how-to-learn-r)`,
+  },
+  {
+    slug: "how-to-learn-r",
+    title: "如何系统学习 R 语言：路径、资源与练习法",
+    excerpt: "从 Base R 到 tidyverse、可视化与统计建模，给出可执行的学习顺序、每周练习模板和避坑建议。",
+    category: "系统教程",
+    date: "2026-07-26",
+    readTime: "14 分钟",
+    tags: ["R", "学习方法", "tidyverse", "数据科学"],
+    cover: "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=800",
+    content: `## 先说结论
+
+学 R 最有效的方式不是把语法手册背完，而是：**短路径学语法 → 立刻做小项目 → 用包解决真实数据问题**。下面给出一条对科研 / 数据分析向都友好的路线。
+
+![R 学习路径示意：Base R → tidyverse → ggplot2 → 统计建模 → 项目练习](/tutorials/r/learning-path.svg)
+
+## 一、推荐学习顺序
+
+1. **Base R**：赋值、向量、因子、数据框、读写、\`for\`/\`if\`、写小函数
+2. **tidyverse**：\`dplyr\` + \`tidyr\` + \`readr\`，掌握 \`filter/select/mutate/summarise/join\`
+3. **ggplot2**：一层一层加几何对象与主题，能复现论文主图风格
+4. **统计与建模**：t 检验、线性回归、\`broom\` 整理模型输出
+5. **项目化**：一个文件夹 = 数据 + 脚本 + 图 + README
+
+## 二、每周练习模板（可直接抄）
+
+目标：每周完成 1 个「能截图发群」的小分析。
+
+\`\`\`r
+library(readr)
+library(dplyr)
+library(ggplot2)
+# 1) 读入（换成你的文件）
+# dat <- read_csv("data/raw.csv")
+dat <- mtcars %>% tibble::rownames_to_column("model")
+# 2) 清洗与汇总
+tab <- dat %>%
+  group_by(cyl) %>%
+  summarise(mean_mpg = mean(mpg), n = n(), .groups = "drop")  # 按缸数汇总
+# 3) 出图
+p <- ggplot(dat, aes(factor(cyl), mpg)) +
+  geom_boxplot() +
+  labs(title = "MPG by cylinders", x = "cyl", y = "mpg")
+print(tab)
+print(p)
+\`\`\`
+
+把脚本存进 \`project/R/01_explore.R\`，图存进 \`project/figures/\`。
+
+## 三、资源怎么选（少而精）
+
+- 书：《R for Data Science》（免费在线）—— tidyverse 主线
+- 官方手册：\`?函数名\`、包 vignette
+- 练习站：RStudio Primers、TidyTuesday（每周真实数据集）
+- 中文社区：互帮问答时附上 \`sessionInfo()\` 与最小可复现例子
+
+## 四、常见坑
+
+- **只看不敲**：第二天就会忘；务必改参数再跑一遍
+- **环境混乱**：一个分析一个 Project（RStudio → New Project）
+- **路径写死在 C 盘用户名**：用相对路径 + 项目根目录
+- **版本飘了**：重要项目记录 R 版本与 \`sessionInfo()\`
+
+\`\`\`r
+sessionInfo()  # 写报告或提问前先跑
+\`\`\`
+
+## 五、30 天里程碑（自检）
+
+- Day 7：能独立安装包、画 \`ggplot\` 散点/箱线
+- Day 14：能用 \`dplyr\` 完成分组汇总与两表合并
+- Day 21：能把分析写成可重复脚本并导出图
+- Day 30：完成一个完整小项目（数据说明 + 代码 + 结论）
+
+## 系列导航
+
+- [R 与 RStudio 安装配置](/blog/r-rstudio-setup-guide)
+- [R 语言入门导览](/blog/r-language-introduction)
+
+配好环境、建立概念后，按本篇路径推进即可；遇到具体分析场景（如单细胞），再进入专题实战帖。`,
+  },
+  {
     slug: "scRNAseq-clustering-guide",
     title: "单细胞RNA测序聚类分析全流程详解",
     excerpt: "从数据预处理到UMAP可视化，手把手带你完成单细胞转录组数据的聚类分析，涵盖Seurat核心流程与参数调优策略。",
