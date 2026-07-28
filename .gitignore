@@ -23,3 +23,6 @@ Thumbs.db
 # misc
 *.local
 .turbo
+
+# local source drafts (do not publish)
+rawtie/

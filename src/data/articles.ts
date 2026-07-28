@@ -22,101 +22,209 @@ export const categories: { name: Category; description: string; icon: string }[]
 
 export const articles: Article[] = [
   {
+    slug: "r-language-install-2026",
+    title: "2026全网最新R语言安装教程 | 零基础小白完美配置R分析环境",
+    excerpt:
+      "Windows 零基础小白R语言安装全教程：从 CRAN 下载 R、规范英文路径、安装 RStudio 与匹配版 Rtools，完成绑定验证配置完美R分析环境。",
+    category: "系统教程",
+    date: "2026-07-28",
+    readTime: "22 分钟",
+    tags: ["R", "RStudio", "Rtools", "环境配置", "Windows", "零基础"],
+    cover: "/tutorials/r/install-2026/card-r-base.png",
+    featured: true,
+    content: `## 一、前言
+
+不知道小伙伴们是因为什么原因接触到 R 语言：个人兴趣、老师布置的统计分析 / 临床建模，还是科研 SCI 需要用 R 做分析。不管出于什么原因，只要有下面这些问题，就请跟着这篇 **2026 全网最新 R 语言安装教程** 看下去——看完你就能在自己电脑上装好 R，正式开启学习之旅。
+
+- 不知道怎么安装 R，找不到官网，乱下安装包，装完打不开；
+- 路径里有中文或空格，后面装包、读文件莫名其妙报错；
+- 只知道 R，不知道 Rtools 或 RStudio；或装了 RStudio、没装 R，版本对不上；
+- 装完不知道怎么验证「到底成没成」，不知道如何检查自身的 R 环境。
+
+这篇教程会带你从零把 **R 环境配置**好，并做完最基本的验证。关键下载入口一律以 [CRAN 官方](https://cran.r-project.org/) 为准。配好后可继续：[R 语言入门导览](/blog/r-language-introduction)。
+
+## 二、什么是 R，R 语言到底都有些什么？
+
+很多新手在网上找教程，装完桌面出现一个图标就以为「装好了 R」——从某种意义上说也没错，但那往往只是 **R base**，还不是完整的 R 分析环境。
+
+**R** 是一门开源的统计计算与数据可视化语言，也是真正负责「算」的软件引擎。统计分析、临床建模，以及生信里的转录组、单细胞（如 Seurat）、Bioconductor 工具，凡是要跑 R 代码，就需要 R base——就像汽车引擎，缺少它代码不可能运行成功。
+
+完整的 R 分析环境是三件套：
+
+<div class="rt-cards">
+  <div class="rt-card">
+    <div class="rt-card-top">
+      <a class="rt-card-logo" href="https://cran.r-project.org/" target="_blank" rel="noopener noreferrer"><img src="/tutorials/r/install-2026/logo-r.png" alt="R logo"></a>
+      <h4><a href="https://cran.r-project.org/" target="_blank" rel="noopener noreferrer">R（R base）</a></h4>
+    </div>
+    <p class="rt-card-desc">类似汽车引擎：运行所有代码。没有它，后面一切都转不起来。</p>
+  </div>
+  <div class="rt-card">
+    <div class="rt-card-top">
+      <a class="rt-card-logo" href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener noreferrer"><img src="/tutorials/r/install-2026/card-rstudio.png" alt="RStudio logo"></a>
+      <h4><a href="https://posit.co/download/rstudio-desktop/" target="_blank" rel="noopener noreferrer">RStudio</a></h4>
+    </div>
+    <p class="rt-card-desc">R 的可视化界面，类似方向盘：看脚本、看图、编辑代码都会更舒服。</p>
+  </div>
+  <div class="rt-card">
+    <div class="rt-card-top">
+      <a class="rt-card-logo" href="https://cran.r-project.org/bin/windows/Rtools/" target="_blank" rel="noopener noreferrer"><img src="/tutorials/r/install-2026/card-rtools.png" alt="Rtools logo"></a>
+      <h4><a href="https://cran.r-project.org/bin/windows/Rtools/" target="_blank" rel="noopener noreferrer">Rtools</a></h4>
+    </div>
+    <p class="rt-card-desc">类似后台补给（油）：帮你装好编译依赖，让额外的 R 包更容易装成功。</p>
+  </div>
+</div>
+
+另外还有 **R 包**（如 \`ggplot2\`、\`dplyr\`，生信里的 \`DESeq2\` / \`Seurat\`）以及 Bioconductor 等，按任务再装，类似修电脑时额外拿的螺丝刀。
+
+Rtools 帮 R 更容易拿到工具；RStudio 把写代码、运行、装包串在一起。
+
+<div class="rt-callout"><strong>安装原则与顺序：先装 R，再装 RStudio，然后再安装 Rtools</strong></div>
+
+## 三、前置条件
+
+- 系统：建议 **Windows 10 或 Windows 11**（64 位）。当前 Windows 版 R 依赖 UCRT，Win10 / Server 2016 起通常自带（见 [CRAN Windows 下载页](https://cran.r-project.org/bin/windows/base/)）。
+- 磁盘：预留至少 **2–5 GB**（后面装包还会涨）。
+- 权限：若提示无法写入，对安装程序 **右键 → 以管理员身份运行**。
+- 路径习惯：用英文路径，例如 \`D:\\\\R\` 或 \`C:\\\\R\`，**尽量不要出现中文、空格、奇怪符号**。
+
+## 四、R 下载入口
+
+**官网下载：**
+
+1. 打开 [R 官网](https://cran.r-project.org/)
+2. 点击 **Download R for Windows**；Mac 则点 [mac 版本](https://cran.r-project.org/bin/macosx/)
+3. 选择下载 **R base**。推荐 [R-4.4.1](https://cran.r-project.org/bin/windows/base/old/4.4.1/R-4.4.1-win.exe)（也可用 [Previous releases](https://cran.r-project.org/bin/windows/base/old/)）。R 更新很快，此版本对常见分析任务较稳定。
+
+另见 [R for Windows FAQ](https://cran.r-project.org/bin/windows/base/rw-FAQ.html)。
+
+**国内镜像（国内用户推荐）：**
+
+- 清华 TUNA：[https://mirrors.tuna.tsinghua.edu.cn/CRAN/](https://mirrors.tuna.tsinghua.edu.cn/CRAN/)
+- 中科大 USTC：[https://mirrors.ustc.edu.cn/CRAN/](https://mirrors.ustc.edu.cn/CRAN/)
+
+![R镜像下载](/tutorials/r/install-2026/ustc-mirror.gif)
+
+## 五、首先安装 R（R base）
+
+**注意：安装前必做！！！**
+
+安装前请检查磁盘空间（建议至少 2–5 GB），在合适盘符下 **新建英文目录** 用来放 R，尽量选非 C 盘。目录名不要出现中文、空格或奇怪符号。例如 C 盘快满时，可放到 D 盘并新建 \`D:\\\\Rworkspace\`。
+
+![安装前磁盘检查](/tutorials/r/install-2026/install-mkdir.gif)
+
+**正式开始安装 R：**
+
+1. 下载 [R base](https://cran.r-project.org/)。推荐 [R-4.4.1](https://cran.r-project.org/bin/windows/base/old/4.4.1/R-4.4.1-win.exe)。
+2. 安装时选择刚刚新建的目录：\`D:\\\\Rworkspace\`。
+3. 双击安装包，语言选 **中文**，安装位置仍选 \`D:\\\\Rworkspace\`，一路「下一步」直到成功。
+4. 安装完成后桌面出现 **RGui**（蓝色 R 图标）。到这里，**R 就已经装好了——理论上所有代码都能在这里运行。**
+
+不过界面偏灰色，不是我们平时习惯的图形化分析环境，因此还需要安装 [RStudio](https://posit.co/download/rstudio-desktop/)。
+
+![Rbase正式安装](/tutorials/r/install-2026/install-rgui.gif)
+
+## 六、安装 RStudio
+
+日常写分析脚本几乎都用 **RStudio Desktop（免费版）**。
+
+1. 官方下载：[posit.co/download/rstudio-desktop](https://posit.co/download/rstudio-desktop/)
+2. 选 Windows 版本；路径同样放在 \`D:\\\\Rworkspace\` 下
+3. **安装目录也改成 \`D:\\\\Rworkspace\`**
+
+![RStudio安装](/tutorials/r/install-2026/install-rstudio.gif)
+
+## 七、最后安装 Rtools
+
+**注意：Rtools 版本必须与 R base 匹配**
+
+Rtools 不是随便下一个就行，必须和 R 的**版本**一一对应：装了 R-4.4.x，就要装 **Rtools44**；装了 R-4.5.x，就要装 **Rtools45**。版本对不上时，编译源码包、找 \`make\` 很容易出问题。官方对照表见 [CRAN Rtools](https://cran.r-project.org/bin/windows/Rtools/)。本教程推荐 **R-4.4.1**，因此请选 **Rtools 4.4**。
+
+<div class="rt-fig-pair">
+  <figure><img src="/tutorials/r/install-2026/r-previous-releases.png" alt="R 旧版本列表（Previous Releases）"></figure>
+  <figure><img src="/tutorials/r/install-2026/rtools-version-table.png" alt="CRAN 官网：Rtools 与 R 版本对应关系"></figure>
+</div>
+
+1. 打开 [CRAN Rtools](https://cran.r-project.org/bin/windows/Rtools/)，按上表选择与自己 R 版本匹配的一项（本教程选 [Rtools 4.4](https://cran.r-project.org/bin/windows/Rtools/rtools44/rtools.html)）。
+2. 下载对应安装包，建议装到默认路径（同样放到 **D:\\\\Rworkspace**）。
+3. 安装完成后可以将三个安装包删除，节省空间。
+
+![Rtools安装](/tutorials/r/install-2026/install-rtools.gif)
+
+## 八、在 RStudio 里面将 R base 和 Rtools 进行绑定
+
+打开 RStudio，若提示找不到 R，到 \`Tools → Global Options → General → R version\` 手动指定刚装的 R base。**这一步就是在绑定 R base。**
+
+接着在 RStudio Console 里先执行：
+
+\`\`\`r
+Sys.which("make")
+\`\`\`
+
+因为此时还没绑定 Rtools，这里一般会是**空的**。然后输入下面这条绑定命令并回车：
+
+\`\`\`r
+writeLines('PATH="\${RTOOLS40_HOME}\\usr\\bin;\${PATH}"', con = "~/.Renviron")
+\`\`\`
+
+写完后建议 **重启一下 R / RStudio**，再重新执行：
+
+\`\`\`r
+Sys.which("make")
+\`\`\`
+
+如果顺利返回类似 \`C:/rtools44/usr/bin/make.exe\`（或你本机 Rtools 目录下的 \`make.exe\`）路径，就说明已经成功和 Rtools 绑定了。
+
+![在 RStudio 中绑定 R base 与 Rtools ](/tutorials/r/install-2026/install-bind.gif)
+
+## 九、注意事项与常见报错
+
+1. **路径含中文/空格** — 安装、项目、数据路径尽量英文。
+2. **只装了 RStudio** — 必须先有 R base 引擎。
+3. **权限不足** — 以管理员身份运行，或换有写权限的盘符。
+4. **官网慢** — 换清华 / 中科大镜像。
+5. **杀毒拦截** — 确认来自 CRAN/镜像后再放行。
+6. **版本焦虑** — 课程指定就装指定版；生信包有时滞后新版 R。
+7. **多版本 R** — RStudio 里明确选中要用的那个。
+8. **Rtools 找不到 make** — 核对 Rtools 与 R 大版本是否匹配，并重启 RStudio。
+
+**macOS 补充（简版）：** 打开 [R for macOS](https://cran.r-project.org/bin/macosx/)；Apple 芯片选 \`arm64\`，Intel 选 \`x86_64\`；按向导安装；需要 X11/\`tcltk\` 时装 [XQuartz](https://www.xquartz.org/)；再装 RStudio，用 \`sessionInfo()\` 验证。
+
+## 十、小结
+
+- 知道 R base 是引擎、RStudio 是驾驶舱、Rtools 是编译补给，**顺序不能反**；
+- 会从 CRAN 或国内镜像下载并安装 Windows 版 R；
+- 会进一步安装 RStudio 与 Rtools，并完成绑定验证。
+
+下一篇：[R 语言入门导览：对象、函数与工作流](/blog/r-language-introduction)。
+
+## 十一、参考与官方来源
+
+- [CRAN 首页](https://cran.r-project.org/)
+- [Download R for Windows（base）](https://cran.r-project.org/bin/windows/base/)
+- [R for Windows FAQ](https://cran.r-project.org/bin/windows/base/rw-FAQ.html)
+- [R for macOS](https://cran.r-project.org/bin/macosx/)
+- [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
+- [RStudio Desktop（Posit）](https://posit.co/download/rstudio-desktop/)
+- [清华 TUNA CRAN 镜像](https://mirrors.tuna.tsinghua.edu.cn/CRAN/)
+- [中科大 USTC CRAN 镜像](https://mirrors.ustc.edu.cn/CRAN/)`,
+  },
+
+  {
     slug: "r-rstudio-setup-guide",
     title: "R 与 RStudio 安装配置全流程（Windows）",
-    excerpt: "从 CRAN 下载 R、安装 RStudio、配置 Rtools 与国内镜像，按步骤配好可复现的数据分析环境。",
+    excerpt: "精简版安装备忘：若你需要图文动效逐步演示，请优先阅读 2026 最新零基础安装教程。",
     category: "系统教程",
     date: "2026-07-26",
-    readTime: "18 分钟",
+    readTime: "8 分钟",
     tags: ["R", "RStudio", "环境配置", "Windows"],
     cover: "https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=800",
-    featured: true,
-    content: `## 写在前面
+    featured: false,
+    content: `## 说明
 
-本篇参考常见安装教程的结构（如[腾讯云社区这篇 R / RStudio 配置文](https://cloud.tencent.com/developer/article/2139514)）：按操作拆步骤，配示意图与动效，方便边看边装。完成后你将拥有：R 本体、RStudio 编辑器、Rtools（编译依赖）、国内 CRAN 镜像。
+本篇为较早的精简备忘。**推荐零基础读者直接阅读：** [2026全网最新R语言安装教程 | 零基础小白完美配置R分析环境](/blog/r-language-install-2026)（含 GIF 演示与 Rtools 版本对照）。
 
-## 一、安装 R
-
-R 是开源的统计计算与可视化平台。打开官网 [https://cran.r-project.org/](https://cran.r-project.org/)，选择 **Download R for Windows** → **base**，下载当前稳定版安装包。
-
-![点击 Download R for Windows（安装步骤示意）](/tutorials/r/cran-download-demo.svg)
-
-安装时建议：
-
-- 自定义目录（避免纯中文路径）
-- 勾选创建桌面快捷方式，方便检查版本
-
-装完后在开始菜单打开 R，能进入控制台即表示本体安装成功。
-
-## 二、安装 RStudio
-
-去 [posit.co/download/rstudio-desktop](https://posit.co/download/rstudio-desktop/) 下载 **RStudio Desktop Free**，安装完成后打开。若看不到脚本编辑区：菜单 **View → Panes → Show All Panes**。
-
-![RStudio 四窗格界面示意（控制台光标闪烁）](/tutorials/r/rstudio-panes-demo.svg)
-
-永久改工作目录（项目默认保存位置）：**Session → Set Working Directory → Choose Directory**，或在控制台执行：
-
-\`\`\`r
-setwd("D:/R/projects")  # 改成你的项目目录
-getwd()  # 确认当前工作目录
-\`\`\`
-
-## 三、配置国内镜像
-
-装包慢时，把 CRAN 换成国内节点：**Tools → Global Options → Packages → Change**，优先选带 **China** 且离你近的镜像 → **Apply**（可能会提示重启）。
-
-![选择 China CRAN 镜像（高亮动效）](/tutorials/r/mirror-setup-demo.svg)
-
-也可在用户目录写入默认镜像（重启后生效）：
-
-\`\`\`r
-options(repos = c(CRAN = "https://mirrors.tuna.tsinghua.edu.cn/CRAN/"))  # 清华源示例
-\`\`\`
-
-## 四、安装并绑定 Rtools
-
-Windows 上编译部分源码包需要 **Rtools**。仍在 CRAN Windows 页面下载与当前 R 主版本匹配的 Rtools，安装后在 RStudio 控制台执行：
-
-\`\`\`r
-writeLines('PATH="\${RTOOLS40_HOME}\\usr\\bin;\${PATH}"', con = "~/.Renviron")  # 写入 Rtools 路径
-\`\`\`
-
-重启 RStudio，再检查：
-
-\`\`\`r
-Sys.which("make")  # 应指向 Rtools 下的 make
-.libPaths()  # 查看包安装目录
-\`\`\`
-
-## 五、验证环境
-
-\`\`\`r
-install.packages(c("jsonlite", "ggplot2", "dplyr"))  # 试装几个常用包
-library(ggplot2)
-library(dplyr)
-sessionInfo()  # 确认 R / 包版本
-\`\`\`
-
-若 C 盘空间紧张，可指定下载缓存目录（先手动建好文件夹）：
-
-\`\`\`r
-install.packages("ggplot2", destdir = "D:/R/downloaded_packages/")  # 安装包缓存到 D 盘
-\`\`\`
-
-## 六、可选：Jupyter 里跑 R
-
-若已使用 Anaconda / Jupyter，可在 R 中安装并注册内核：
-
-\`\`\`r
-install.packages("IRkernel")
-IRkernel::installspec()  # 注册 R kernel 到 Jupyter
-\`\`\`
-
-重新打开 Jupyter Notebook，新建笔记本时应能看到 **R** 内核。
-
-## 系列下一篇
-
-环境就绪后，建议继续阅读：[R 语言入门导览：对象、函数与工作流](/blog/r-language-introduction)。`,
+装好后可继续：[R 语言入门导览](/blog/r-language-introduction)。`,
   },
   {
     slug: "r-language-introduction",
@@ -130,7 +238,7 @@ IRkernel::installspec()  # 注册 R kernel 到 Jupyter
     featured: true,
     content: `## 这篇解决什么问题
 
-上一篇我们完成了 [R / RStudio 安装配置](/blog/r-rstudio-setup-guide)。本篇不再纠结安装，而是建立心智模型：R 里数据怎么存、代码怎么写、一次分析怎么跑通。
+上一篇我们完成了 [R 语言安装与环境配置](/blog/r-language-install-2026)。本篇不再纠结安装，而是建立心智模型：R 里数据怎么存、代码怎么写、一次分析怎么跑通。
 
 ![R 的三大核心：向量、数据框、函数](/tutorials/r/r-concepts.svg)
 
