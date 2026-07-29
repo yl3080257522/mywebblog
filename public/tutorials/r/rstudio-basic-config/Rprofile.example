@@ -1,0 +1,9 @@
+# Project-level .Rprofile example
+# Put this file in a project root only when you understand the startup behavior.
+# Changes take effect after restarting R.
+
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+options(stringsAsFactors = FALSE)
+options(width = 100)
+
+message("Project .Rprofile loaded: ", getwd())

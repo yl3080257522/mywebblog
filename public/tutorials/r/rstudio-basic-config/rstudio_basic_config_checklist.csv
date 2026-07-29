@@ -1,0 +1,8 @@
+"check","command_or_place"
+"Use an RStudio Project","File -> New Project"
+"Avoid Chinese or special characters in project path","getwd()"
+"Keep code/data/results separated","code/ data/ results/"
+"Set a stable CRAN mirror","Tools -> Global Options -> Packages or options(repos=...)"
+"Keep package library writable",".libPaths()"
+"Avoid saving .RData automatically","Tools -> Global Options -> General"
+"Restart R after editing .Rprofile","Session -> Restart R"

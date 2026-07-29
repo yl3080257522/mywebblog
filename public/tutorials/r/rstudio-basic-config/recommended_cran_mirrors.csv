@@ -1,0 +1,4 @@
+"name","url","use_case"
+"Global cloud CRAN","https://cloud.r-project.org","Default global CDN mirror, good general choice"
+"Tsinghua CRAN mirror","https://mirrors.tuna.tsinghua.edu.cn/CRAN/","Common mirror for users in mainland China"
+"USTC CRAN mirror","https://mirrors.ustc.edu.cn/CRAN/","Common mirror for users in mainland China"

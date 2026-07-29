@@ -1,0 +1,7 @@
+"sample_id","group","cells","median_genes"
+"ctrl_1","control",3200,1450
+"ctrl_2","control",2950,1390
+"ctrl_3","control",3360,1510
+"treat_1","treatment",4100,1780
+"treat_2","treatment",4380,1850
+"treat_3","treatment",4020,1710

@@ -1,0 +1,7 @@
+"source","command","when_to_use"
+"CRAN","install.packages(""ggplot2"")","Most general R packages from CRAN"
+"Bioconductor","BiocManager::install(""DESeq2"")","Bioconductor packages for genomics and bioinformatics"
+"GitHub","remotes::install_github(""satijalab/seurat"")","Development version or package only hosted on GitHub"
+"pak","pak::pkg_install(""tidyverse/ggplot2"")","Fast dependency solving across CRAN, Bioconductor, GitHub and local sources"
+"local_source","install.packages(""pkg_1.0.0.tar.gz"", repos = NULL, type = ""source"")","Local source archive, usually needs build tools if compiled code exists"
+"local_binary_zip","install.packages(""pkg_1.0.0.zip"", repos = NULL, type = ""win.binary"")","Local Windows binary package, usually no source compilation needed"

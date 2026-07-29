@@ -1,0 +1,6 @@
+"package","installed","version"
+"BiocManager",TRUE,"1.30.27"
+"remotes",TRUE,"2.5.0"
+"pak",TRUE,"0.9.2"
+"readr",TRUE,"2.2.0"
+"ggplot2",TRUE,"4.0.2"

@@ -1,0 +1,4 @@
+Import failed: 无法打开链结
+Rows: 6
+Columns: 6
+High mitochondrial samples: treat_1, treat_3

@@ -153,10 +153,12 @@ function renderMarkdown(content: string): string {
 const renderedContent = renderMarkdown(article.content);
 
 const headingMatches = [...renderedContent.matchAll(/<h2 id="([^"]+)"[^>]*>([\s\S]*?)<\/h2>/g)];
-const tocItems = headingMatches.map(m => ({
-	id: m[1],
-	text: m[2].replace(/<[^>]+>/g, ''),
-}));
+const tocItems = headingMatches.slice(0, 11).map(m => {
+	const full = m[2].replace(/<[^>]+>/g, '');
+	// 侧边目录只保留冒号前主标题，正文 h2 仍显示完整文案
+	const text = full.replace(/[：:].*$/, '').trim();
+	return { id: m[1], text };
+});
 
 const searchIndex = articles
 	.filter((a) => a.slug !== article.slug)
@@ -169,6 +171,36 @@ const searchIndex = articles
 		sameCategory: a.category === article.category,
 		sharedTags: a.tags.filter((t) => article.tags.includes(t)).length,
 	}));
+
+const site = Astro.site ?? new URL('https://rstudyhub.online');
+const articleUrl = new URL(`/blog/${article.slug}`, site).href;
+const articleImage = article.cover
+	? article.cover.startsWith('http://') || article.cover.startsWith('https://')
+		? article.cover
+		: new URL(article.cover, site).href
+	: undefined;
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: article.title,
+	description: article.excerpt,
+	datePublished: article.date,
+	dateModified: article.date,
+	mainEntityOfPage: articleUrl,
+	url: articleUrl,
+	image: articleImage ? [articleImage] : undefined,
+	articleSection: article.category,
+	keywords: article.tags,
+	inLanguage: 'zh-CN',
+	author: {
+		'@type': 'Organization',
+		name: '知识专栏',
+	},
+	publisher: {
+		'@type': 'Organization',
+		name: '知识专栏',
+	},
+};
 ---
 
 <Layout
@@ -261,6 +293,7 @@ const searchIndex = articles
 		<button type="button" class="rt-lightbox-close" id="rt-lightbox-close" aria-label="关闭">×</button>
 		<img alt="" id="rt-lightbox-img" />
 	</div>
+	<script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
 </Layout>
 
 <style is:global>
@@ -593,6 +626,45 @@ const searchIndex = articles
 		background: #eaf7ef;
 		border: 1px solid #b7e0c4;
 		color: #1f7a45;
+	}
+	.rt-note {
+		margin: 1rem 0;
+		padding: 0.85rem 1rem;
+		border-radius: 12px;
+		background: #e8efff;
+		border: 1px solid #c9dbff;
+		color: #1f4fbf;
+	}
+	.rt-table-wrap {
+		margin: 1rem 0 1.15rem;
+		overflow-x: auto;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		background: #fff;
+	}
+	.rt-table {
+		width: 100%;
+		min-width: 640px;
+		border-collapse: collapse;
+		font-size: 0.94rem;
+		color: #2b3345;
+	}
+	.rt-table th,
+	.rt-table td {
+		border-bottom: 1px solid #e2e8f0;
+		border-right: 1px solid #e2e8f0;
+		padding: 0.62rem 0.75rem;
+		text-align: left;
+		vertical-align: top;
+		line-height: 1.55;
+	}
+	.rt-table tr:last-child td { border-bottom: 0; }
+	.rt-table th:last-child,
+	.rt-table td:last-child { border-right: 0; }
+	.rt-table th {
+		background: #f5f7fb;
+		font-weight: 800;
+		color: #243044;
 	}
 	.rt-fig {
 		margin: 1.25rem 0;

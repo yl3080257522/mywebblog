@@ -1,0 +1,7 @@
+"sample_id","group","cells","median_genes","percent_mito"
+"ctrl_1","control",3200,1450,4.8
+"ctrl_2","control",2950,1390,5.1
+"ctrl_3","control",3360,1510,4.3
+"treat_1","treatment",4100,1780,6.2
+"treat_2","treatment",4380,1850,5.7
+"treat_3","treatment",4020,1710,6.5
