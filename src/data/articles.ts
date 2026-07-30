@@ -307,12 +307,11 @@ Source 一般在左上角，也就是写脚本的地方。它最适合放需要�
 \`\`\`r
 # 创建一个基因名向量
 genes <- c("MS4A1", "CD3D", "LYZ")
-
 # 查看这个向量有几个元素
 length(genes)
 \`\`\`
 
-把上面几行写进 Source 后，可以对照下面演示：**写好代码 → 运行 → Environment / Console 跟着变化**。
+将代码复制到 Source 区，然后按照下面可演示初步体验一下 R 从编写代码到运行的过程和变化：**点击Run运行**，然后会发现在 Source 区的代码会输入到 Console 里面，然后才会真正运行，同时会发现 Environment 里面多了一个名为 **genes** 的 Value。
 
 ![Source 中逐步运行代码演示](/tutorials/r/rstudio-interface/source-run-demo.gif)
 
@@ -320,21 +319,9 @@ length(genes)
 
 ## 四、Console 控制台：马上运行和看报错的地方
 
-Console 一般在左下角。看到 <code>&gt;</code>，就说明 R 正在等待我们输入命令。
+**Console** 也就是代码运行区的控制台，可以看到它前面会有一个 **>**，意味着在等待我们输入要执行的 R 代码或者命令，比如我们直接在这里面输入 \`1+1\` 然后 **Enter** 确认，就会看到结果直接运行出来得到了结果 2。只要是**运行代码**，都会出现在这里，是真正运行代码的地方，我们以后的**报错**、**调试**，基本上都是在这里。
 
 ![Console 控制台批注：输入命令与查看输出](/tutorials/r/rstudio-interface/console-annotated.png)
-
-\`\`\`r
-1 + 1
-\`\`\`
-
-输出通常是：
-
-\`\`\`text
-[1] 2
-\`\`\`
-
-这里的 <code>[1]</code> 暂时不用紧张，它表示这一行输出从第 1 个结果开始显示。真正的计算结果是后面的 <code>2</code>。
 
 Console 适合做这些事情：
 
@@ -343,18 +330,6 @@ Console 适合做这些事情：
 - 读报错信息；
 - 临时检查对象；
 - 清空控制台后重新运行。
-
-例如：
-
-\`\`\`r
-mean(c(10, 20, 30))
-\`\`\`
-
-输出是：
-
-\`\`\`text
-[1] 20
-\`\`\`
 
 常用小技巧可以参考 [R Console](https://docs.posit.co/ide/user/ide/guide/code/console.html) 和 [Keyboard Shortcuts](https://docs.posit.co/ide/user/ide/reference/shortcuts.html)：
 
@@ -366,89 +341,54 @@ mean(c(10, 20, 30))
 
 ## 五、Environment 环境区：查看对象有没有创建成功
 
-Environment 一般在右上角。它显示的是当前 R 会话里已经创建出来的对象。
+**Environment** 区域位于右上角，顾名思义，它就是**环境**，更准确的说是**数据运行环境**，它会记录所有我们代码运行过程中的**中间数据**，以及**数据结果和其他变量**，方便我们记住同时减少后续运算。
 
-![Environment 环境区批注：Console 运行后对象出现在这里](/tutorials/r/rstudio-interface/environment-annotated.png)
-
-比如运行：
+![Environment环境区：储存所有数据结果](/tutorials/r/rstudio-interface/environment-annotated.png)
 
 \`\`\`r
-genes <- c("MS4A1", "CD3D", "LYZ", "PPBP", "NKG7")
-\`\`\`
-
-运行后，Environment 里应该出现一个叫 <code>genes</code> 的对象。
-
-再运行：
-
-\`\`\`r
-qc_table <- data.frame(
+genes <- c("MS4A1", "CD3D", "LYZ", "PPBP", "NKG7")  # 运行后，Environment 里应出现名为 genes 的对象
+qc_table <- data.frame(  # 再建一个小表格对象
   sample = c("sample_1", "sample_2", "sample_3"),
   cells = c(3200, 4100, 2850),
   median_genes = c(1500, 1760, 1320)
-)
+)  # 运行后，Environment 里应出现 qc_table
 \`\`\`
 
-Environment 里应该出现 <code>qc_table</code>，并且能看到它是一个 data frame。官方 [Data Viewer](https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html) 文档也说明，RStudio 可以用 <code>View(data)</code> 或 Environment 中的数据表图标打开矩形数据。
+运行完后可以看到，Environment 里应该出现 <code>qc_table</code>，并且能看到它是一个 **data frame**。官方 [Data Viewer](https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html) 文档也说明，RStudio 可以用 <code>View(data)</code> 或 Environment 中的数据表图标打开矩形数据。
 
 对生信分析来说，Environment 很重要，因为我们经常需要确认：
 
-- Seurat 对象是否创建成功；
-- 表达矩阵是否读进来了；
-- 差异分析结果表是否存在；
-- 富集分析结果是不是空的；
+- **Seurat 对象**是否创建成功；
+- **表达矩阵**是否读进来了；
+- **差异分析结果**表是否存在；
+- **富集分析结果**是不是空的；
 - 某一步是否把旧对象覆盖了。
 
-新手常犯的一个错误是：代码运行后只看 Console 有没有红字，却不看 Environment。实际上，很多时候代码没有报错，但对象内容不对，后面也会出问题。
+新手常犯的一个错误那就是：复刻别人代码的时候直接运行，但是经常会有**各种代码报错**，就是因为不会看 Environment，通常是因为变量名称对应不上的问题。
 
 ## 六、Output 输出区：文件、图片、包和帮助都在这里
 
-Output 一般在右下角。它不是一个单独功能，而是一组标签页。按照 [Pane Layout](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html) 的说明，Output pane 常见包含 Files、Plots、Packages、Help、Viewer、Presentation 等标签页。
+Output 一般在右下角。它不是一个单独功能，而是一组标签页。按照 [Pane Layout](https://docs.posit.co/ide/user/ide/guide/ui/ui-panes.html) 的说明，Output pane 常见包含 **Files**、**Plots**、**Packages**、**Help**、**Viewer**、**Presentation** 等标签页。
 
 常见用途：
 
-- Files：浏览当前工作目录里的文件；
-- Plots：显示 R 画出来的图；
-- Packages：查看和加载已经安装的 R 包；
-- Help：查看函数帮助文档；
-- Viewer：显示 HTML、小网页、Shiny、htmlwidgets 等结果。
+- **Files**：浏览当前工作目录里的文件；
+- **Plots**：显示 R 画出来的图；
+- **Packages**：查看和加载已经安装的 R 包；
+- **Help**：查看函数帮助文档；
+- **Viewer**：显示 HTML、小网页、Shiny、htmlwidgets 等结果。
 
-比如运行：
+比如运行下面的这一行绘图代码，就可以看到在 Output 的 Plots 标签页出现一个图片：
 
 \`\`\`r
 plot(1:5)
 \`\`\`
 
-图一般会出现在 Plots 标签页。
+![在 Output 的 Plots 标签页查看绘图结果](/tutorials/r/rstudio-interface/output-plots-demo.png)
 
-如果运行：
+## 七、代码小练
 
-\`\`\`r
-?mean
-help(mean)
-\`\`\`
-
-帮助文档会出现在 Help 标签页。
-
-如果保存了一张图：
-
-\`\`\`r
-dir.create("results", showWarnings = FALSE)
-png("results/demo.png")
-plot(1:5)
-dev.off()
-\`\`\`
-
-然后可以在 Files 标签页里找到 <code>results/demo.png</code>。RStudio 官方 [Managing Files](https://docs.posit.co/ide/user/ide/guide/ui/files.html) 文档也强调，Files 标签页可以在当前文件夹中创建、删除、重命名、打开文件，并能辅助管理工作目录。
-
-## 七、用一段代码把四个窗格串起来
-
-下面这段代码已经放在本帖配套目录：
-
-\`\`\`text
-rawtie/02-初步认识RStudio界面/code/rstudio-interface-demo.R
-\`\`\`
-
-建议大家把它复制到 RStudio 的 Source 窗格里，逐行运行，并观察四个窗格分别发生了什么变化。
+这里给大家一个**示例的简单代码**，大家可以一步步去运行，然后看看三个核心区域的变化，重点体验一下运行代码应该怎么做，运行后的结果储存在哪，画图的图片输出在 output 然后查看。
 
 \`\`\`r
 # 1. 在 Console 中会看到这行代码的输出结果
@@ -503,37 +443,7 @@ dev.off()
 sessionInfo()
 \`\`\`
 
-这段代码的观察重点：
-
-- 运行 <code>print()</code> 后，Console 会显示文字输出；
-- 运行 <code>genes &lt;- ...</code> 后，Environment 会多一个 genes；
-- 运行 <code>qc_table &lt;- ...</code> 后，Environment 会多一个表格对象；
-- 在 RStudio 交互环境中运行 <code>View(qc_table)</code>，会打开数据查看页；
-- 运行 <code>plot()</code> 后，Output 区的 Plots 会出现散点图；
-- 运行 <code>png()</code> 到 <code>dev.off()</code> 后，Files 里能看到保存出来的图片；
-- 运行 <code>sessionInfo()</code> 后，Console 会输出当前 R 版本、系统、已加载包等信息。
-
-## 八、运行结果怎么看
-
-我在本地用 <code>Rscript</code> 跑过这段代码，确认脚本可以生成结果图：
-
-![RStudio 示例代码生成的 QC 图](/tutorials/r/rstudio-interface/rstudio-demo-qc.png)
-
-这张图只是一个演示图，不代表真实生物学结论。它的作用是让大家理解：R 运行代码后，图可以出现在 Plots，也可以被保存成文件。
-
-在真实单细胞分析中，类似图可能会换成：
-
-- 每个样本的细胞数；
-- 每个细胞检测到的基因数；
-- 线粒体基因比例；
-- UMI 数；
-- 过滤前后的细胞数量变化。
-
-但无论图复杂还是简单，RStudio 的逻辑都是一样的：**代码在 Source，执行在 Console，对象看 Environment，图和文件看 Output**。
-
-另外，<code>sessionInfo()</code> 是非常重要的排查命令。以后如果安装包失败、Seurat 版本不一致、Bioconductor 报错，经常需要把 <code>sessionInfo()</code> 的输出贴出来，方便判断 R 版本、系统环境和包版本。
-
-## 九、新手最容易混淆的几个点
+## 八、新手最容易混淆的几个点
 
 1. **不要把 RStudio 当成 R 本身**：R 是真正执行代码的语言和运行环境，RStudio 是帮助我们写代码、运行代码和管理结果的界面。
 2. **不要把 Source 和 Console 混成一个东西**：Source 适合保存正式脚本，Console 适合临时运行和查看输出。
@@ -543,20 +453,16 @@ sessionInfo()
 
 后续做真实项目时，建议使用 [RStudio Projects](https://docs.posit.co/ide/user/ide/guide/code/projects.html) 把输入数据、脚本、分析结果和图放在同一个项目上下文里。这样比到处散放文件更容易复现，也更适合科研分析。
 
-## 十、小结与官方来源
+## 九、小结
 
-这篇我们不追求写复杂代码，只解决一个入门问题：打开 RStudio 后到底该看哪里。
+这篇主要是重点介绍 **Rstudio这个集成运行环境**，主要包括了下面四个组成成分，率先了解如何操控 **R语言工作台** 才能更好的使用 R 语言。接下来就可以正式开始 R 语言学习了，让我们进入下一节 [R 语言入门导览](/blog/r-language-introduction)。
 
-你现在需要记住四句话：
+- Source：**代码存储区**
+- Console：**代码运行区**
+- Environment：**数据存储区**
+- Output：**结果输出区**
 
-- Source：写正式脚本；
-- Console：运行命令和看输出；
-- Environment：检查对象是否创建成功；
-- Output：看文件、图、包、帮助和网页结果。
-
-后面进入 [R 语言入门导览](/blog/r-language-introduction)、ggplot2 作图、转录组差异分析、单细胞 Seurat 流程时，这四个窗格会一直出现。先把界面逻辑看懂，再去学分析流程，会少很多无效报错和重复试错。
-
-参考与官方来源：
+## 十、参考来源
 
 - [RStudio IDE User Guide（Posit）](https://docs.posit.co/ide/user/)
 - [Get Started - RStudio Panes（Posit）](https://docs.posit.co/ide/user/ide/get-started/)
